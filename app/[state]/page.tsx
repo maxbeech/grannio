@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Calculator from "@/components/Calculator";
+import FinancingSection from "@/components/FinancingSection";
 import { STATES, getState, citySlug } from "@/lib/states";
 import { estimateCost, formatUSD, ADU_TYPES } from "@/lib/cost";
 import { stateMetaTitle, stateMetaDescription, breadcrumbLd } from "@/lib/seo";
@@ -128,6 +129,10 @@ export default async function StatePage({ params }: Props) {
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section>
+        <FinancingSection />
       </section>
 
       {s.cities.length > 0 && (

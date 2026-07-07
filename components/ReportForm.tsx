@@ -1,35 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import { site } from "@/lib/site";
 import { ADU_TYPES } from "@/lib/cost";
 import { buildLeadMailto, isValidEmail } from "@/lib/lead";
+import { submitReportCheckout } from "@/components/report-checkout";
 
-// Honest lead capture: composes a real, prefilled email to the ADUYes inbox via the
-// visitor's mail client. No fake "submitted!" state — the lead only sends when the
-// visitor actually sends the email. (Upgrade path to a stored backend is documented
-// in README under "Lead capture".)
+// Real checkout: posts to /api/checkout/report, which creates a $49 Stripe Checkout
+// Session, and redirects the browser to Stripe. There is no client-side "submitted!"
+// state for success — the report is only recorded as a lead once Stripe's webhook
+// confirms the payment actually went through (see app/api/webhooks/stripe/route.ts).
+// On a failure to even start checkout, we show the actual error plus a mailto fallback.
 export default function ReportForm() {
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [fallback, setFallback] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
-    const email = String(f.get("email") || "").trim();
-    if (!isValidEmail(email)) {
-      setError("Please enter a valid email so we can send your report.");
-      return;
-    }
-    setError(null);
-    window.location.href = buildLeadMailto({
+    const values = {
       name: String(f.get("name") || ""),
-      email,
+      email: String(f.get("email") || "").trim(),
       zip: String(f.get("zip") || ""),
       aduType: String(f.get("aduType") || ""),
       timeline: String(f.get("timeline") || ""),
-    });
-    setSent(true);
+    };
+    if (!isValidEmail(values.email)) {
+      setStatus("error");
+      setError("Please enter a valid email so we can send your report.");
+      return;
+    }
+    setStatus("submitting");
+    setError(null);
+    const result = await submitReportCheckout({ ...values, sourcePath: window.location.pathname });
+    if (result.ok && result.url) {
+      window.location.href = result.url;
+      return;
+    }
+    setStatus("error");
+    setError(result.error || "Something went wrong.");
+    setFallback(buildLeadMailto(values));
   }
 
   return (
@@ -69,17 +79,19 @@ export default function ReportForm() {
           </select>
         </div>
       </div>
-      {error && <p className="mt-2 text-sm text-amber-300" role="alert">{error}</p>}
-      <button type="submit" className="mt-4 w-full rounded-xl bg-emerald-700 px-6 py-3 font-semibold text-white transition hover:bg-emerald-600">
-        Request my report
-      </button>
-      {sent && (
-        <p className="mt-3 text-sm text-emerald-300" role="status">
-          Your email app should now be open with your details — just hit send and we&apos;ll reply with your report. If nothing opened, email us at{" "}
-          <a href={`mailto:${site.email}`} className="underline">{site.email}</a>.
+      {status === "error" && (
+        <p className="mt-2 text-sm text-amber-300" role="alert">
+          {error}{" "}
+          {fallback && <a href={fallback} className="underline">Email us your details instead →</a>}
         </p>
       )}
-      <p className="mt-3 text-xs text-slate-400">We use your details only to prepare your report and connect you with vetted ADU builders. No spam.</p>
+      <button type="submit" disabled={status === "submitting"}
+        className="mt-4 w-full rounded-xl bg-emerald-700 px-6 py-3 font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-60">
+        {status === "submitting" ? "Redirecting to checkout…" : "Get my report — $49"}
+      </button>
+      <p className="mt-3 text-xs text-slate-400">
+        Secure checkout via Stripe. We use your details only to prepare your report and connect you with vetted ADU builders. No spam.
+      </p>
     </form>
   );
 }

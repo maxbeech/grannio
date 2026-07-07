@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* ADUYes uses an intentional light theme (slate-50 page + white cards),
+/* Grannio uses an intentional light theme (slate-50 page + white cards),
    controlled entirely by Tailwind utility classes in the layout. We do NOT
    follow the OS dark-mode preference here, because the hero/section text is
    dark slate and would be unreadable on a dark background. */

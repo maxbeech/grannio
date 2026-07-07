@@ -1,11 +1,11 @@
-# ADUYes — ADU Feasibility & Cost Calculator
+# Grannio — ADU Feasibility & Cost Calculator
 
 Free accessory dwelling unit (ADU) feasibility checker and cost calculator. Pick your
 state, ADU type and size to instantly see what your city's rules allow (size, setbacks,
 parking, owner-occupancy) and what a backyard ADU will cost — built from regional
 construction-cost indices and published statewide ADU statutes.
 
-**Live:** https://aduyes.vercel.app · **Domain:** aduyes.com (pending)
+**Live:** https://grannio.vercel.app · **Domain:** grannio.com (pending)
 
 ## SEO strategy
 
@@ -37,19 +37,45 @@ are length-guarded by tests for every route.
 
 ## Monetisation
 
-1. **Builder lead-gen** — refer homeowners to vetted ADU builders (`adu builder` keyword
-   carries a ~$21 top-of-page CPC).
-2. **Detailed feasibility report** — $49. Captured via the `ReportForm` component.
-3. **Pro subscription** — for builders/realtors (roadmap).
+Built as a **lead marketplace**, not a consumer subscription — an ADU is a one-time,
+high-ticket homeowner purchase, so recurring "Pro" access for homeowners has nothing to
+renew against. Three lead types feed one backend:
 
-### Lead capture (current vs. upgrade)
+1. **Builder lead-gen** (primary) — `components/BuilderLeadForm.tsx` on every city page
+   (`/[state]/[city]`) and cost-type page (`/cost/[type]`), the highest-intent surfaces.
+   `adu builder` / `adu contractors near me` carry $21–28 top-of-page CPC on Google Ads —
+   captured here organically instead, for resale per-lead or rev-share to vetted builders.
+2. **Financing lead-gen + affiliate** (secondary) — `components/FinancingSection.tsx` on
+   the homepage and every state page: three verified, currently-live financing programmes
+   (RenoFi, Fannie Mae HomeStyle Renovation, CalHFA ADU Grant) as informational links
+   (config in `lib/financing-partners.ts` — swap in tracked affiliate URLs once a
+   programme is signed, no other code changes needed), plus a financing lead form.
+3. **Detailed feasibility report** — $49, positioned as a lead magnet: `ReportForm` on the
+   homepage. Captures a report request lead through the same backend.
+4. **Paid builder directory / white-label embed** — for builders/realtors (roadmap, not
+   yet built): recurring revenue that sits on the B2B side instead of the homeowner side.
 
-`components/ReportForm.tsx` currently composes a **real prefilled email** to the ADUYes
-inbox via the visitor's mail client — honest (the lead only sends when they hit send), with
-no fake "submitted" state and zero backend. **Upgrade path** (external, requires provisioning):
-add a Vercel Function (`app/api/lead/route.ts`) that writes leads to a datastore
-(Vercel Postgres / KV) and notifies via an email API (e.g. Resend) — needs the datastore +
-`RESEND_API_KEY` env set in Vercel. Until then the mailto flow is the honest MVP.
+### Lead capture backend
+
+All three forms POST JSON to `app/api/lead/route.ts` (a Vercel Function, Node.js runtime —
+not cached, every request runs live). The route never fakes success:
+
+- **Resend** sends a real notification email if `RESEND_API_KEY` is set (`RESEND_FROM_EMAIL`
+  and `LEAD_NOTIFY_EMAIL` are optional overrides — see `.env.example`).
+- **Supabase** additionally persists the lead as a row if `SUPABASE_URL` +
+  `SUPABASE_SERVICE_ROLE_KEY` are set (schema: `leads` table — `kind`, `name`, `email`,
+  `phone`, `zip`, `state_slug`, `city`, `adu_type`, `sqft`, `lot_sqft`,
+  `financing_amount`, `timeline`, `notes`, `source_path`, `created_at`). **Not yet
+  provisioned** — a new Supabase project/credentials are pending; once added as env vars,
+  persistence turns on with no code changes.
+- If **neither** is configured, the route returns an explicit `503` with a real error
+  message — never a dummy "submitted!" state. Every form shows that error plus a working
+  `mailto:` fallback so a lead is never silently dropped.
+- A hidden honeypot field (`company`) silently no-ops bot submissions.
+
+Pure validation/formatting logic (`validateLeadPayload`, `buildLeadNotificationText`,
+`leadEmailSubject`) lives in `lib/lead.ts`, fully unit-tested alongside the original
+`buildLeadMailto` fallback helpers.
 
 ## Vercel / free-tier strategy
 
@@ -72,10 +98,24 @@ required for the free tier.
 
 ```bash
 npm install
+cp .env.example .env.local   # fill in RESEND_API_KEY (+ SUPABASE_* once provisioned)
 npm run dev      # http://localhost:3000
-npm test         # cost + feasibility + data-integrity unit tests
+npm test         # cost + feasibility + data-integrity + lead-payload unit tests
 npm run build    # static export of all programmatic pages
 ```
+
+### Manual follow-ups still required
+
+- **Supabase**: a new project/credentials are pending (the previous org hit its 2-project
+  free-tier limit) — once given, set `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` in Vercel
+  and lead persistence turns on automatically.
+- **Resend**: no API key configured yet — sign up, verify a sending domain (or use the
+  `onboarding@resend.dev` default for testing), and set `RESEND_API_KEY` in Vercel for lead
+  notification emails to actually send.
+- **grannio.com**: confirmed available (`whois` — no match) as of 2026-07-06, not yet
+  purchased/registered. Buy it, point DNS at Vercel, then add it as the project domain.
+- **GitHub/Vercel renames**: both already done via CLI (`gh repo rename`, `vercel project
+  rename`) — nothing further needed there.
 
 ## Data & disclaimers
 

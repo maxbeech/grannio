@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Calculator from "@/components/Calculator";
+import BuilderLeadForm from "@/components/BuilderLeadForm";
 import { STATES, findCity, citySlug } from "@/lib/states";
 import { estimateCost, formatUSD, cityCostMultiplier } from "@/lib/cost";
 import { cityMetaTitle, cityMetaDescription, breadcrumbLd } from "@/lib/seo";
@@ -110,6 +111,10 @@ export default async function CityPage({ params }: Props) {
       <section>
         <h2 className="text-2xl font-bold text-slate-900">Estimate your {cityName} ADU cost</h2>
         <div className="mt-6"><Calculator defaultStateSlug={s.slug} defaultCityMultiplier={cityMultiplier} /></div>
+      </section>
+
+      <section>
+        <BuilderLeadForm stateSlug={s.slug} city={cityName} />
       </section>
 
       <section>

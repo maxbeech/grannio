@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ADU_TYPES, getAduType, estimateCost, formatUSD } from "@/lib/cost";
 import { STATES } from "@/lib/states";
+import BuilderLeadForm from "@/components/BuilderLeadForm";
 import { costMetaTitle, costMetaDescription, breadcrumbLd } from "@/lib/seo";
 import { site } from "@/lib/site";
 
@@ -72,6 +73,10 @@ export default async function CostTypePage({ params }: Props) {
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section>
+        <BuilderLeadForm />
       </section>
 
       <section>

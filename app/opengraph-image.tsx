@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 // Branded social-share image used as the default Open Graph / Twitter card.
-export const alt = "ADUYes — Free ADU feasibility & cost calculator";
+export const alt = "Grannio — Free ADU feasibility & cost calculator";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -37,7 +37,7 @@ export default function OpengraphImage() {
           >
             A
           </div>
-          <div style={{ fontSize: 40, fontWeight: 700 }}>ADUYes</div>
+          <div style={{ fontSize: 40, fontWeight: 700 }}>Grannio</div>
         </div>
         <div style={{ marginTop: 40, fontSize: 64, fontWeight: 800, lineHeight: 1.1, maxWidth: 980 }}>
           Can you build an ADU? Find out in 60 seconds.

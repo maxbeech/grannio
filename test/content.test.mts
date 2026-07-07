@@ -77,7 +77,7 @@ for (const s of STATES) {
 }
 
 // --- Page-template meta lengths (title base ≤60, description 80–160) ---
-// "base" = before the " | ADUYes" suffix the layout template appends (8 chars).
+// "base" = before the " | Grannio" suffix the layout template appends (8 chars).
 const TITLE_MAX = 60, DESC_MAX = 160, DESC_MIN = 60;
 check(`site.description ≤ ${DESC_MAX}`, site.description.length <= DESC_MAX, `len ${site.description.length}`);
 check(`site.description ≥ ${DESC_MIN}`, site.description.length >= DESC_MIN, `len ${site.description.length}`);
@@ -110,7 +110,7 @@ check("body has email", body.includes("jane@example.com"));
 check("body has all labels", ["Name:", "Email:", "Property ZIP:", "ADU type:", "Timeline:", "Notes:"].every((l) => body.includes(l)));
 check("body missing fields => dash", buildLeadBody({ email: "x@y.com" }).includes("Name: —"));
 const mailto = buildLeadMailto({ name: "Jane & Co. <test>", email: "jane@example.com", notes: "100% sure! a+b=c" });
-check("mailto targets inbox", mailto.startsWith("mailto:hello@aduyes.com?"));
+check("mailto targets inbox", mailto.startsWith("mailto:hello@grannio.com?"));
 check("mailto has encoded subject", mailto.includes("subject=ADU%20feasibility%20report%20request"));
 check("mailto encodes special chars (& < space)", mailto.includes("Jane%20%26%20Co.%20%3Ctest%3E") && !mailto.includes("Jane & Co."));
 check("mailto encodes newlines", mailto.includes("%0A"));
@@ -152,6 +152,35 @@ check("no wrong WA cite 'sb 5258'", !allText.includes("sb 5258"));
 check("no fabricated Florida ADU preemption 'hb 7'", !/florida[^.]*\bhb 7\b/.test(allText) && !allText.includes("adu preemption law (hb 7)"));
 check("Florida not claimed as statewide ADU mandate", !/florida'?s (sweeping )?(2023 )?adu preemption/.test(allText));
 check("Oregon credits SB 1051", allText.includes("sb 1051"));
+
+// --- /api/lead payload validation (lib/lead.ts) ---
+import { validateLeadPayload, buildLeadNotificationText, leadEmailSubject } from "../lib/lead.ts";
+check("valid report lead passes", validateLeadPayload({ kind: "report", email: "a@b.com" }).ok);
+check("valid builder lead passes", validateLeadPayload({ kind: "builder", email: "a@b.com" }).ok);
+check("valid financing lead passes", validateLeadPayload({ kind: "financing", email: "a@b.com" }).ok);
+check("missing kind rejected", !validateLeadPayload({ email: "a@b.com" } as never).ok);
+check("unknown kind rejected", !validateLeadPayload({ kind: "spam" as never, email: "a@b.com" }).ok);
+check("invalid email rejected", !validateLeadPayload({ kind: "report", email: "not-an-email" }).ok);
+check("missing email rejected", !validateLeadPayload({ kind: "report" } as never).ok);
+
+for (const k of ["report", "builder", "financing"] as const) {
+  check(`${k}: subject non-empty`, leadEmailSubject(k).length > 0);
+}
+const notif = buildLeadNotificationText({ kind: "builder", email: "jane@example.com", stateSlug: "california", city: "Fresno", financingAmount: 150000 });
+check("notification includes email", notif.includes("jane@example.com"));
+check("notification includes city", notif.includes("Fresno"));
+check("notification formats financing amount", notif.includes("$150000"));
+check("notification missing fields => dash", buildLeadNotificationText({ kind: "report", email: "a@b.com" }).includes("—"));
+
+// --- Financing partner config integrity (lib/financing-partners.ts) ---
+import { FINANCING_PARTNERS } from "../lib/financing-partners.ts";
+check("at least 2 financing partners", FINANCING_PARTNERS.length >= 2, `got ${FINANCING_PARTNERS.length}`);
+check("financing partner names unique", new Set(FINANCING_PARTNERS.map((p) => p.name)).size === FINANCING_PARTNERS.length);
+for (const p of FINANCING_PARTNERS) {
+  check(`${p.name}: href is https`, p.href.startsWith("https://"), p.href);
+  check(`${p.name}: has description`, p.description.length > 20);
+  check(`${p.name}: has cta text`, p.cta.length > 0);
+}
 
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);

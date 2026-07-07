@@ -180,7 +180,7 @@ export const POSTS: Post[] = [
     blocks: [
       { type: "p", text: "The permit is where most ADU projects stall — not because the unit is unbuildable, but because owners don't know the sequence. Here's the path nearly every ADU follows, and where the time goes." },
       { type: "h2", text: "1. Feasibility (1–2 weeks)" },
-      { type: "p", text: "Confirm your lot allows an ADU and what size and setbacks apply. In states with a statewide law this is usually a yes; elsewhere you check the local zoning code. This is the stage ADUYes is built for." },
+      { type: "p", text: "Confirm your lot allows an ADU and what size and setbacks apply. In states with a statewide law this is usually a yes; elsewhere you check the local zoning code. This is the stage Grannio is built for." },
       { type: "h2", text: "2. Design and construction documents (4–10 weeks)" },
       { type: "p", text: "An architect or designer produces the drawings the city needs: site plan, floor plan, elevations, structural and Title 24/energy calcs. Prefab units shortcut much of this with pre-approved plans." },
       { type: "h2", text: "3. Plan check submission and review (4–12 weeks)" },

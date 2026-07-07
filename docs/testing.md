@@ -1,6 +1,6 @@
-# ADUYes — Testing & Validation Coverage
+# Grannio — Testing & Validation Coverage
 
-_Last verified: 2026-06-14._
+_Last verified: 2026-07-06._
 
 ## Automated (`npm test` — 3,909 assertions, all passing)
 
@@ -34,6 +34,29 @@ The site is fully static + ISR served from Vercel's global edge CDN. High-RPS lo
 would exercise Vercel's CDN, not our code, and provides no signal — the concurrency burst
 above confirms consistent edge delivery.
 
+## 2026-07-06 — Lead-capture backend + rebrand
+
+- **Unit tests**: `npm test` — 1,171 assertions, 0 failed, including new coverage for
+  `validateLeadPayload`, `buildLeadNotificationText`, `leadEmailSubject` (all three lead
+  kinds) and `lib/financing-partners.ts` config integrity (https-only URLs, non-empty
+  copy, unique names).
+- **Build**: `npm run build` clean — 329 static/SSG pages unchanged, `/api/lead` correctly
+  compiles as a dynamic (`ƒ`) route, every other route keeps its 1-week ISR revalidation.
+- **API-level verification** (`curl` against a local dev server): `POST /api/lead` with no
+  `RESEND_API_KEY`/Supabase envs set → `503` with the real "not connected yet" error (no
+  fake success); invalid email → `400`; valid `financing`-kind payload behaves identically
+  to `report`/`builder`.
+- **Browser-verified directly** (openhelm_browser MCP, not chrome-devtools — that MCP was
+  disconnected this session): the homepage `FinancingSection` form was filled and
+  submitted in a real headless Chromium instance; the expected error text ("Lead capture
+  isn't connected yet…") was located rendered on the page at the submit button's position,
+  confirming the failure state displays correctly. A first-pass Haiku sub-agent flagged
+  this as a false negative (likely mis-scoped element interaction) — resolved by
+  re-verifying directly rather than trusting the sub-agent's report at face value.
+- **Not tested**: actual Resend delivery and Supabase persistence — no credentials are
+  provisioned yet (see README "Manual follow-ups"). Both paths are unit-tested for their
+  pure logic and will need a live smoke test once keys are added.
+
 ## MUST be manually tested (impossible in this harness)
 
 1. **Lead-form mail-client open** — clicking "Request my report" with a valid email sets the
@@ -44,3 +67,7 @@ above confirms consistent edge delivery.
    Tailwind autoprefixed) with no Chromium-only features; verify rendering on the other engines.
 3. **Screen readers (VoiceOver / NVDA / JAWS)** — axe-core covers programmatic semantics
    (labels, roles, names, contrast); do a manual pass with a real screen reader for flow/announcements.
+4. **Live Resend + Supabase smoke test** — once `RESEND_API_KEY` (and later `SUPABASE_URL`
+   / `SUPABASE_SERVICE_ROLE_KEY`) are set in Vercel, submit each of the three lead forms
+   for real and confirm the notification email actually arrives and (once Supabase is
+   connected) a row appears in the `leads` table.

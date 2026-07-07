@@ -10,7 +10,7 @@ export const revalidate = 604800;
 
 export const metadata: Metadata = {
   title: "How We Estimate ADU Costs & Feasibility",
-  description: "How ADUYes calculates ADU cost, feasibility and rental estimates — the data sources, regional cost index and assumptions behind every number.",
+  description: "How Grannio calculates ADU cost, feasibility and rental estimates — the data sources, regional cost index and assumptions behind every number.",
   alternates: { canonical: `${site.url}/methodology` },
 };
 
@@ -26,7 +26,7 @@ export default function Methodology() {
       <header>
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">How we estimate ADU costs &amp; feasibility</h1>
         <p className="mt-3 text-lg text-slate-600">
-          Every number on ADUYes is a transparent planning estimate — never a quote. Here is exactly how we calculate it,
+          Every number on Grannio is a transparent planning estimate — never a quote. Here is exactly how we calculate it,
           so you can judge how much weight to give it.
         </p>
       </header>

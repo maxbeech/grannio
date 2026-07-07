@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Calculator from "@/components/Calculator";
 import ReportForm from "@/components/ReportForm";
+import FinancingSection from "@/components/FinancingSection";
 import { STATES } from "@/lib/states";
 import { ADU_TYPES } from "@/lib/cost";
 import { POSTS } from "@/lib/posts";
@@ -22,7 +23,7 @@ const FAQ = [
   { q: "How accurate is the ADU cost estimate?", a: "The calculator uses 2024–2025 turnkey cost ranges per ADU type, scaled by a regional construction-cost index for your state. It returns a realistic low–high range for planning. Your final price depends on your specific lot, finishes and contractor — always get a local quote." },
   { q: "Can I build an ADU on my property?", a: "In states with a statewide ADU law (like California, Washington and Oregon), almost every single-family lot qualifies for at least one ADU by right. Elsewhere it depends on local zoning. Our calculator flags the rules that apply to your state and the things to confirm with your city." },
   { q: "What's the difference between an ADU and a JADU?", a: "A JADU (junior ADU) is up to 500 sq ft and must be built inside your existing home, usually with an owner-occupancy requirement. A full ADU can be detached, attached or a garage conversion, larger, and in most states rentable without living on-site." },
-  { q: "Is ADUYes free?", a: "Yes — the feasibility checker and cost calculator are free. We offer an optional paid detailed feasibility report and can connect you with vetted ADU builders in your area." },
+  { q: "Is Grannio free?", a: "Yes — the feasibility checker and cost calculator are free. We offer an optional paid detailed feasibility report and can connect you with vetted ADU builders in your area." },
 ];
 
 export default function Home() {
@@ -62,7 +63,7 @@ export default function Home() {
 
       {/* How it works */}
       <section>
-        <h2 className="text-center text-2xl font-bold text-slate-900">How ADUYes works</h2>
+        <h2 className="text-center text-2xl font-bold text-slate-900">How Grannio works</h2>
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {[
             { n: "1", t: "Tell us your property", d: "Pick your state, the ADU type you're considering and a rough size." },
@@ -106,6 +107,11 @@ export default function Home() {
           <span className="text-sm text-slate-400">one-time · 100% applied as credit if you build with a partner</span>
         </div>
         <ReportForm />
+      </section>
+
+      {/* Financing */}
+      <section>
+        <FinancingSection />
       </section>
 
       {/* States */}
