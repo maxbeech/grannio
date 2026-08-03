@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "deploy": "npx vercel pull --yes --environment=production && npx vercel build --prod && npx vercel deploy --prebuilt --prod",
     "start": "next start",
     "lint": "eslint",
     "test": "tsx test/engine.test.mts && tsx test/content.test.mts"
@@ -14,7 +15,6 @@
     "next": "16.2.9",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "resend": "^4",
     "stripe": "^22.3.0"
   },
   "devDependencies": {

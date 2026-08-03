@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { site } from "@/lib/site";
+import { sendEmail } from "@/lib/openhelm-mail";
 import { buildLeadNotificationText, leadEmailSubject, type LeadPayload } from "@/lib/lead";
 import { getStripe, REPORT_PRICE_CENTS, REPORT_PRICE_CURRENCY } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
@@ -136,48 +137,36 @@ async function handlePaidSession(session: Stripe.Checkout.Session, supabase: Sup
 }
 
 async function sendNotificationEmail(payload: LeadPayload) {
-  const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey) return;
-  try {
-    const { Resend } = await import("resend");
-    const resend = new Resend(resendKey);
-    const from = process.env.RESEND_FROM_EMAIL || `${site.name} Leads <onboarding@resend.dev>`;
-    const { error } = await resend.emails.send({
-      from,
-      to: process.env.LEAD_NOTIFY_EMAIL || site.email,
-      replyTo: payload.email,
-      subject: leadEmailSubject(payload.kind),
-      text: buildLeadNotificationText(payload),
-    });
-    if (error) throw error;
-  } catch (err) {
-    console.error("[api/webhooks/stripe] Notification email failed:", err);
+  // Stripe may redeliver a webhook; `clientId` makes a redelivery return the
+  // original message instead of emailing the same lead twice.
+  const result = await sendEmail({
+    to: process.env.LEAD_NOTIFY_EMAIL || site.email,
+    replyTo: payload.email,
+    subject: leadEmailSubject(payload.kind),
+    text: buildLeadNotificationText(payload),
+    clientId: `grannio-lead-notify:${payload.email}:${payload.kind}`,
+  });
+  if (!result.sent && result.reason === "error") {
+    console.error("[api/webhooks/stripe] Notification email failed:", result.error);
   }
 }
 
 async function sendCustomerConfirmation(email: string, name?: string) {
-  const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey) return;
-  try {
-    const { Resend } = await import("resend");
-    const resend = new Resend(resendKey);
-    const from = process.env.RESEND_FROM_EMAIL || `${site.name} <onboarding@resend.dev>`;
-    const { error } = await resend.emails.send({
-      from,
-      to: email,
-      replyTo: site.email,
-      subject: "Your Grannio ADU feasibility report is on its way",
-      text: [
-        `Hi ${name?.trim() || "there"},`,
-        "",
-        "Thanks for your payment — we've received your $49 detailed ADU feasibility report request.",
-        "We'll email your personalized report within 2 business days.",
-        "",
-        `Questions in the meantime? Just reply to this email or reach us at ${site.email}.`,
-      ].join("\n"),
-    });
-    if (error) throw error;
-  } catch (err) {
-    console.error("[api/webhooks/stripe] Customer confirmation email failed:", err);
+  const result = await sendEmail({
+    to: email,
+    replyTo: site.email,
+    subject: "Your Grannio ADU feasibility report is on its way",
+    text: [
+      `Hi ${name?.trim() || "there"},`,
+      "",
+      "Thanks for your payment — we've received your $49 detailed ADU feasibility report request.",
+      "We'll email your personalized report within 2 business days.",
+      "",
+      `Questions in the meantime? Just reply to this email or reach us at ${site.email}.`,
+    ].join("\n"),
+    clientId: `grannio-confirm:${email}`,
+  });
+  if (!result.sent && result.reason === "error") {
+    console.error("[api/webhooks/stripe] Customer confirmation email failed:", result.error);
   }
 }

@@ -2,10 +2,11 @@ import { NextResponse } from "next/server";
 import { site } from "@/lib/site";
 import { validateLeadPayload, buildLeadNotificationText, leadEmailSubject, type LeadPayload } from "@/lib/lead";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
+import { sendEmail, emailEnabled } from "@/lib/openhelm-mail";
 
 // Vercel Function (Node.js runtime, Fluid Compute) — not cached; every request runs live.
 // Real-data policy: this route never fabricates a success. It only returns { ok: true }
-// once a lead has actually been persisted (Supabase) or actually emailed (Resend). If
+// once a lead has actually been persisted (Supabase) or actually emailed (OpenHelm Mail). If
 // neither backend is configured it fails loudly with a real error, so the UI can show an
 // honest fallback instead of a fake "submitted" state.
 
@@ -29,10 +30,10 @@ export async function POST(request: Request) {
   }
   const payload = body as LeadPayload;
 
-  const resendKey = process.env.RESEND_API_KEY;
+  const canEmail = emailEnabled();
   const supabase = await getSupabaseAdmin();
 
-  if (!resendKey && !supabase) {
+  if (!canEmail && !supabase) {
     return NextResponse.json(
       { ok: false, error: "Lead capture isn't connected yet — please email us directly." },
       { status: 503 }
@@ -65,24 +66,21 @@ export async function POST(request: Request) {
     }
   }
 
+  // The notification goes out on this product's own OpenHelm Mail inbox, with
+  // the lead's address as Reply-To so replying answers the person who enquired
+  // rather than the product's mailbox.
   let emailed = false;
-  if (resendKey) {
-    try {
-      const { Resend } = await import("resend");
-      const resend = new Resend(resendKey);
-      const from = process.env.RESEND_FROM_EMAIL || `${site.name} Leads <onboarding@resend.dev>`;
-      const { error } = await resend.emails.send({
-        from,
-        to: process.env.LEAD_NOTIFY_EMAIL || site.email,
-        replyTo: payload.email,
-        subject: leadEmailSubject(payload.kind),
-        text: buildLeadNotificationText(payload),
-      });
-      if (error) throw error;
-      emailed = true;
-    } catch (err) {
-      console.error("[api/lead] Resend send failed:", err);
-    }
+  if (canEmail) {
+    const result = await sendEmail({
+      to: process.env.LEAD_NOTIFY_EMAIL || site.email,
+      replyTo: payload.email,
+      subject: leadEmailSubject(payload.kind),
+      text: buildLeadNotificationText(payload),
+    });
+    // "Held for approval" is not delivery: leave `emailed` false so the caller
+    // still depends on the Supabase write for its success claim.
+    emailed = result.sent && result.status !== "pending_approval";
+    if (!result.sent) console.error("[api/lead] mail send failed:", result.error ?? result.reason);
   }
 
   if (!stored && !emailed) {
