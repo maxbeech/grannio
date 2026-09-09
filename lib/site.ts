@@ -7,7 +7,7 @@ export const site = {
   // Kept ≤155 chars so it isn't truncated in search results (guarded by a test).
   description:
     "Free ADU feasibility & cost calculator. Check your state's accessory dwelling unit rules — size, setbacks, parking — and estimate your build cost in seconds.",
-  email: "hello@grannio.com",
+  email: "hello@mail.grannio.com",
   // Disclaimer shown wherever cost / rule output appears.
   disclaimer:
     "Estimates are for planning only and are based on regional construction-cost indices and " +

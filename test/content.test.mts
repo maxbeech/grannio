@@ -1,5 +1,7 @@
 // Content + data-integrity tests: blog posts and the programmatic URL surface.
 // Run: tsx test/content.test.mts
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { POSTS, getPost, type Block } from "../lib/posts.ts";
 import { STATES, citySlug, findCity } from "../lib/states.ts";
 import { ADU_TYPES } from "../lib/cost.ts";
@@ -24,6 +26,9 @@ for (const p of POSTS) {
   check(`${p.slug}: description 80-180 chars`, p.description.length >= 80 && p.description.length <= 180, `len ${p.description.length}`);
   check(`${p.slug}: date ISO`, /^\d{4}-\d{2}-\d{2}$/.test(p.date));
   check(`${p.slug}: reading minutes set`, p.readingMinutes >= 1);
+  check(`${p.slug}: image path is public-rooted`, p.image.startsWith("/blog/"), p.image);
+  check(`${p.slug}: image file exists`, existsSync(fileURLToPath(new URL(`../public${p.image}`, import.meta.url))), p.image);
+  check(`${p.slug}: has image alt text`, p.imageAlt.trim().length >= 10, p.imageAlt);
   check(`${p.slug}: has >=4 blocks`, p.blocks.length >= 4, `got ${p.blocks.length}`);
   check(`${p.slug}: has >=1 h2`, p.blocks.some((b) => b.type === "h2"));
   check(`${p.slug}: has a CTA`, p.blocks.some((b) => b.type === "cta"));
@@ -110,7 +115,7 @@ check("body has email", body.includes("jane@example.com"));
 check("body has all labels", ["Name:", "Email:", "Property ZIP:", "ADU type:", "Timeline:", "Notes:"].every((l) => body.includes(l)));
 check("body missing fields => dash", buildLeadBody({ email: "x@y.com" }).includes("Name: —"));
 const mailto = buildLeadMailto({ name: "Jane & Co. <test>", email: "jane@example.com", notes: "100% sure! a+b=c" });
-check("mailto targets inbox", mailto.startsWith("mailto:hello@grannio.com?"));
+check("mailto targets inbox", mailto.startsWith("mailto:hello@mail.grannio.com?"));
 check("mailto has encoded subject", mailto.includes("subject=ADU%20feasibility%20report%20request"));
 check("mailto encodes special chars (& < space)", mailto.includes("Jane%20%26%20Co.%20%3Ctest%3E") && !mailto.includes("Jane & Co."));
 check("mailto encodes newlines", mailto.includes("%0A"));
