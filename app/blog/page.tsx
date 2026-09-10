@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { POSTS } from "@/lib/posts";
 import { site } from "@/lib/site";
@@ -24,10 +25,15 @@ export default function BlogIndex() {
       </header>
       <div className="grid gap-4 sm:grid-cols-2">
         {POSTS.map((p) => (
-          <Link key={p.slug} href={`/blog/${p.slug}`} className="block rounded-2xl border border-slate-200 bg-white p-6 transition hover:border-emerald-400 hover:shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">{p.title}</h2>
-            <p className="mt-2 text-sm text-slate-600">{p.description}</p>
-            <p className="mt-3 text-xs text-slate-500">{p.readingMinutes} min read</p>
+          <Link key={p.slug} href={`/blog/${p.slug}`} className="block overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:border-emerald-400 hover:shadow-sm">
+            <div className="relative h-40 w-full">
+              <Image src={p.image} alt={p.imageAlt} fill sizes="(min-width: 640px) 50vw, 100vw" className="object-cover" />
+            </div>
+            <div className="p-6">
+              <h2 className="text-lg font-semibold text-slate-900">{p.title}</h2>
+              <p className="mt-2 text-sm text-slate-600">{p.description}</p>
+              <p className="mt-3 text-xs text-slate-500">{p.readingMinutes} min read</p>
+            </div>
           </Link>
         ))}
       </div>

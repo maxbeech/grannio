@@ -7,21 +7,28 @@ export type Block =
   | { type: "p"; text: string }
   | { type: "h2"; text: string }
   | { type: "ul"; items: string[] }
-  | { type: "cta"; text: string; href: string };
+  | { type: "cta"; text: string; href: string }
+  | { type: "table"; caption?: string; headers: string[]; rows: string[][] };
 
 export type Post = {
   slug: string;
+  image: string;
+  imageAlt: string;
   title: string;
   description: string;
   keyword: string;
   date: string; // YYYY-MM-DD
   readingMinutes: number;
   blocks: Block[];
+  // Optional FAQ pairs — rendered as FAQPage JSON-LD in addition to the on-page copy.
+  faq?: { q: string; a: string }[];
 };
 
 export const POSTS: Post[] = [
   {
     slug: "how-much-does-an-adu-cost",
+    image: "/blog/how-much-does-an-adu-cost.jpg",
+    imageAlt: "Small backyard cottage exterior representing an ADU",
     title: "How Much Does an ADU Cost in 2026? Real Numbers by Type and State",
     description:
       "What an ADU actually costs in 2026 — by construction type (detached, garage conversion, JADU, prefab) and by region, plus the hidden soft costs people forget.",
@@ -49,6 +56,8 @@ export const POSTS: Post[] = [
   },
   {
     slug: "garage-to-adu-conversion-cost",
+    image: "/blog/garage-to-adu-conversion-cost.jpg",
+    imageAlt: "Garage exterior being converted into a living space",
     title: "Garage to ADU Conversion Cost: What You'll Actually Pay",
     description:
       "Converting a garage is the cheapest way to add an ADU. Here's what a garage-to-ADU conversion really costs in 2026, what drives the price up, and when it beats a detached build.",
@@ -76,6 +85,8 @@ export const POSTS: Post[] = [
   },
   {
     slug: "california-adu-rules-2026",
+    image: "/blog/california-adu-rules-2026.jpg",
+    imageAlt: "Modern house exterior in California",
     title: "California ADU Rules in 2026: Size, Setbacks & Parking",
     description:
       "A plain-English guide to California's statewide ADU law in 2026 — the 800 sq ft guarantee, 4 ft setbacks, the transit parking exemption and the 60-day approval rule.",
@@ -99,6 +110,8 @@ export const POSTS: Post[] = [
   },
   {
     slug: "adu-vs-jadu",
+    image: "/blog/adu-vs-jadu.jpg",
+    imageAlt: "Cozy tiny house interior",
     title: "ADU vs JADU: Which Backyard Unit Should You Build?",
     description:
       "ADU vs JADU explained — the size limits, cost difference, owner-occupancy rules and rental potential of a junior ADU versus a full accessory dwelling unit.",
@@ -123,6 +136,8 @@ export const POSTS: Post[] = [
   },
   {
     slug: "how-to-finance-an-adu",
+    image: "/blog/how-to-finance-an-adu.jpg",
+    imageAlt: "Calculator and paperwork for financial planning",
     title: "How to Finance an ADU: 6 Ways to Pay for a Backyard Home",
     description:
       "Six ways to finance an ADU in 2026 — HELOC, cash-out refinance, renovation loans, construction loans, ADU-specific loans and contractor financing — with the pros and cons of each.",
@@ -148,6 +163,8 @@ export const POSTS: Post[] = [
   },
   {
     slug: "prefab-adu-cost",
+    image: "/blog/prefab-adu-cost.jpg",
+    imageAlt: "Modular prefab home under construction",
     title: "Prefab ADU Cost: Is a Modular Backyard Home Actually Cheaper?",
     description:
       "What a prefab or modular ADU costs in 2026, how it compares to a site-built unit, and the site-work and delivery costs people forget to budget for.",
@@ -171,6 +188,8 @@ export const POSTS: Post[] = [
   },
   {
     slug: "adu-permit-process",
+    image: "/blog/adu-permit-process.jpg",
+    imageAlt: "Architectural blueprints and plans on a desk",
     title: "The ADU Permit Process: A Step-by-Step Guide for 2026",
     description:
       "How the ADU permit process actually works in 2026 — from feasibility and design through plan check, approval and inspections — and how long each stage takes.",
@@ -194,6 +213,8 @@ export const POSTS: Post[] = [
   },
   {
     slug: "adu-rental-income-and-roi",
+    image: "/blog/adu-rental-income-and-roi.jpg",
+    imageAlt: "House for rent with key handoff",
     title: "ADU Rental Income & ROI: Do Backyard Units Actually Pay Off?",
     description:
       "How much rental income an ADU generates, how to estimate payback period and ROI, and the factors that make a backyard unit a strong or weak investment.",
@@ -221,6 +242,8 @@ export const POSTS: Post[] = [
   },
   {
     slug: "how-long-to-build-an-adu",
+    image: "/blog/how-long-to-build-an-adu.jpg",
+    imageAlt: "House under construction with framing",
     title: "How Long Does It Take to Build an ADU?",
     description:
       "A realistic ADU timeline for 2026 — from feasibility and design through permitting and construction — and how prefab and garage conversions can cut months off the schedule.",
@@ -245,6 +268,8 @@ export const POSTS: Post[] = [
   },
   {
     slug: "washington-adu-law-hb-1337",
+    image: "/blog/washington-adu-law-hb-1337.jpg",
+    imageAlt: "Craftsman-style house in a Seattle neighborhood",
     title: "Washington ADU Law (HB 1337): What Homeowners Need to Know",
     description:
       "Washington's HB 1337 (2023) requires cities to allow two ADUs per lot. Here's what the law guarantees on size, parking and owner-occupancy — and what it means for your build.",
@@ -288,6 +313,8 @@ export function relatedPosts(slug: string, n = 3): Post[] {
 const WEEK2_POSTS: Post[] = [
   {
     slug: "washington-state-adu-rules",
+    image: "/blog/washington-state-adu-rules.jpg",
+    imageAlt: "Homes on a Pacific Northwest waterfront",
     title: "Washington State ADU Rules: What Homeowners Can Build in 2026",
     description: "Washington's 2023 ADU law (HB 1337) requires cities statewide to allow ADUs on single-family lots. Here's what the law mandates and what you can actually build.",
     keyword: "washington state adu rules",
@@ -314,6 +341,8 @@ const WEEK2_POSTS: Post[] = [
   },
   {
     slug: "oregon-adu-laws",
+    image: "/blog/oregon-adu-laws.jpg",
+    imageAlt: "Houses on a hillside in Oregon",
     title: "Oregon ADU Laws: Statewide Rules That Override Local Restrictions",
     description: "Oregon's SB 1051 (2017) and HB 2001 (2019) make it one of the most ADU-friendly states. Here's what you can build, how large it can be, and what cities can no longer restrict.",
     keyword: "oregon adu laws",
@@ -337,6 +366,8 @@ const WEEK2_POSTS: Post[] = [
   },
   {
     slug: "texas-adu-regulations",
+    image: "/blog/texas-adu-regulations.jpg",
+    imageAlt: "Suburban house neighborhood in Texas",
     title: "ADU Regulations in Texas: A City-by-City Breakdown",
     description: "Texas has no statewide ADU legislation, so the rules depend entirely on your city. Here is the ADU landscape in Austin, Houston, Dallas, San Antonio and other Texas markets.",
     keyword: "texas adu regulations",
@@ -360,6 +391,8 @@ const WEEK2_POSTS: Post[] = [
   },
   {
     slug: "adu-setback-requirements",
+    image: "/blog/adu-setback-requirements.jpg",
+    imageAlt: "Backyard fence marking a property line",
     title: "ADU Setback Requirements: How Close to the Property Line?",
     description: "ADU setbacks determine how close to the property line your unit can sit. California mandates a maximum 4-foot setback for most ADUs. Here is how other states and cities compare.",
     keyword: "adu setback requirements",
@@ -383,6 +416,8 @@ const WEEK2_POSTS: Post[] = [
   },
   {
     slug: "adu-size-limits-by-state",
+    image: "/blog/adu-size-limits-by-state.jpg",
+    imageAlt: "Tape measure on an architectural blueprint",
     title: "ADU Size Limits by State: Maximum Square Footage Rules Explained",
     description: "State ADU laws set a floor for maximum allowed ADU size. California allows up to 1,200 sq ft; Oregon up to 900 sq ft on smaller lots. Here are the rules by state.",
     keyword: "adu size limits by state",
@@ -408,6 +443,8 @@ const WEEK2_POSTS: Post[] = [
   },
   {
     slug: "container-home-adu",
+    image: "/blog/container-home-adu.jpg",
+    imageAlt: "Shipping container converted into a home",
     title: "Container Home ADU: Is a Shipping Container ADU Cheaper or Legal?",
     description: "Shipping container ADUs look striking — but are they actually cheaper to build, and are they legal in your jurisdiction? An honest look at the trade-offs.",
     keyword: "container home adu",
@@ -432,6 +469,8 @@ const WEEK2_POSTS: Post[] = [
   },
   {
     slug: "adu-building-codes",
+    image: "/blog/adu-building-codes.jpg",
+    imageAlt: "Construction worker reviewing blueprints on site",
     title: "ADU Building Codes: Key Requirements for Safety and Permitting",
     description: "ADUs must meet the same building codes as primary homes — electrical, plumbing, structural, fire and energy. Here are the key requirements to plan around.",
     keyword: "adu building codes",
@@ -457,6 +496,8 @@ const WEEK2_POSTS: Post[] = [
   },
   {
     slug: "florida-adu-rules",
+    image: "/blog/florida-adu-rules.jpg",
+    imageAlt: "House with palm trees in Florida",
     title: "ADU Rules in Florida: What Homeowners Need to Know in 2026",
     description: "Florida has no statewide ADU mandate — rules are set by your city or county. Here's how Florida ADU zoning works and what to check before you build.",
     keyword: "florida adu rules",
@@ -481,6 +522,8 @@ const WEEK2_POSTS: Post[] = [
   },
   {
     slug: "adu-parking-requirements",
+    image: "/blog/adu-parking-requirements.jpg",
+    imageAlt: "Cars parked in a residential driveway",
     title: "ADU Parking Requirements: Are You Required to Add a Parking Space?",
     description: "California dropped ADU parking requirements near transit, and many states followed. Here's how ADU parking rules work and how they affect your project's feasibility.",
     keyword: "adu parking requirements",
@@ -505,6 +548,8 @@ const WEEK2_POSTS: Post[] = [
   },
   {
     slug: "adu-impact-fees",
+    image: "/blog/adu-impact-fees.jpg",
+    imageAlt: "Calculator and receipts for tracking fees",
     title: "ADU Impact Fees: What They Are and How to Reduce Them",
     description: "Impact fees are one-time charges on new construction. California exempts most ADUs under 750 sq ft. Here's how impact fees work for ADUs and how to reduce them.",
     keyword: "adu impact fees",
@@ -528,6 +573,8 @@ const WEEK2_POSTS: Post[] = [
   },
   {
     slug: "adu-for-aging-parents",
+    image: "/blog/adu-for-aging-parents.jpg",
+    imageAlt: "Multigenerational family spending time together at home",
     title: "Building an ADU for Aging Parents: The Complete Planning Guide",
     description: "An ADU lets aging parents live nearby while maintaining independence. This guide covers planning for accessibility, permitting, cost and financing a family ADU project.",
     keyword: "adu for aging parents",
@@ -556,6 +603,8 @@ const WEEK2_POSTS: Post[] = [
   },
   {
     slug: "adu-zoning-laws",
+    image: "/blog/adu-zoning-laws.jpg",
+    imageAlt: "Aerial view of a suburban neighborhood",
     title: "ADU Zoning Laws: How Zoning Affects What You Can Build on Your Lot",
     description: "ADU zoning rules control where, how large and how dense ADUs can be on a given parcel. Understanding your zoning designation is the first step in any ADU project.",
     keyword: "adu zoning laws",
@@ -583,3 +632,73 @@ const WEEK2_POSTS: Post[] = [
 
 // Merge the week-2 posts into the main export
 POSTS.push(...WEEK2_POSTS);
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Authority pillar: the canonical "what is an ADU" definition page
+// ──────────────────────────────────────────────────────────────────────────────
+
+POSTS.push({
+  slug: "what-is-an-adu",
+  image: "/blog/what-is-an-adu.jpg",
+  imageAlt: "Small detached backyard cottage with a covered porch, an example of an ADU",
+  title: "What Is an ADU? Accessory Dwelling Units Explained",
+  description:
+    "What is an ADU? A plain-English guide to accessory dwelling units: the types, the size limits, how they differ from a JADU, and what one actually costs.",
+  keyword: "what is an adu",
+  date: "2026-09-10",
+  readingMinutes: 8,
+  blocks: [
+    { type: "p", text: "An ADU (accessory dwelling unit) is a second, complete home built on the same lot as an existing house. It has its own kitchen, its own bathroom and its own entrance, so someone can live in it fully independently from the main house. You'll also hear it called a granny flat, a casita, a backyard cottage or a mother-in-law suite: different names for the same thing." },
+    { type: "h2", text: "The short definition" },
+    { type: "p", text: "Strip away the regional slang and an ADU comes down to three requirements. It sits on a residential lot that already has a primary home. It's smaller than that primary home. And it's self-contained, meaning a person could move in and never need to set foot in the main house to cook, sleep or shower." },
+    { type: "p", text: "That third point is what separates an ADU from a shed, a home office or a simple room addition. A backyard studio with no kitchen isn't an ADU under most state laws; it's an accessory structure. Add a stove, a sink and a bathroom, and it crosses the line into a real second dwelling." },
+    { type: "h2", text: "What an ADU is not" },
+    { type: "p", text: "People often lump ADUs in with tiny homes, RVs and park models, but the categories don't overlap much. A tiny home on wheels is personal property, not real estate, and most cities won't count it toward your ADU allowance. An RV parked in the driveway isn't a dwelling unit under any building code, however long someone sleeps in it. A pool house or workshop without plumbing for a kitchen is an accessory structure, not an ADU, until you add that plumbing and a permit to match. The line is always the same: permanent foundation, full kitchen, full bathroom, and a building permit that says so." },
+    { type: "h2", text: "Casita, granny flat, in-law suite: same thing, different accent" },
+    { type: "p", text: "Where you live changes what people call it, not what it is. In California and much of the Southwest, casita is common. In the Northeast and Midwest, you'll hear granny flat, mother-in-law suite or in-law apartment. Builders and planning departments almost always default to the formal term, ADU, because that's what shows up in the zoning code and the permit application." },
+    { type: "h2", text: "The four ways an ADU gets built" },
+    { type: "p", text: "Every ADU falls into one of four construction types, and the type you choose changes both the cost and the rules that apply to you." },
+    { type: "table", caption: "The four ADU types compared", headers: ["Type", "Typical size cap", "What it is", "Owner-occupancy required?"], rows: [
+      ["Detached ADU", "800–1,200 sq ft", "A freestanding structure built new in the yard", "No, in most states"],
+      ["Attached ADU", "800–1,200 sq ft", "An addition built onto the existing house", "No, in most states"],
+      ["Garage conversion", "Existing garage footprint", "The garage shell converted into living space", "No, in most states"],
+      ["Junior ADU (JADU)", "500 sq ft", "Carved out of the existing home's interior", "Usually yes"],
+    ] },
+    { type: "p", text: "A detached ADU is the most flexible and usually the most expensive, because you're building an entire new structure from the foundation up. A garage conversion reuses a shell that already exists, which is why it's typically the cheapest full-size option. An attached ADU splits the difference, sharing at least one wall with the main house." },
+    { type: "h2", text: "ADU vs JADU: the one rule that trips people up" },
+    { type: "p", text: "A junior ADU, or JADU, looks like a smaller sibling of the ADU but plays by different rules. It's capped at 500 sq ft, has to be built inside the existing footprint of the home rather than as new construction, and can share a bathroom with the main house. The catch is owner-occupancy: most states that allow JADUs require the property owner to live in either the main home or the JADU itself. A standard ADU usually carries no such requirement, which is why it's the better choice if your plan is a pure rental." },
+    { type: "cta", text: "Compare ADU vs JADU size, cost and rental rules in detail", href: "/blog/adu-vs-jadu" },
+    { type: "h2", text: "What an ADU actually costs" },
+    { type: "p", text: "Cost swings enormously by type and region, but as a rule of thumb a garage conversion runs roughly $120–$220 per square foot, while a ground-up detached ADU runs $220–$360 per square foot before land or permit costs. A 600 sq ft detached unit can land anywhere from $130,000 to well over $250,000 depending on your state's construction-labor market." },
+    { type: "cta", text: "Read the full ADU cost breakdown by construction type", href: "/blog/how-much-does-an-adu-cost" },
+    { type: "h2", text: "Can you actually build one on your property?" },
+    { type: "p", text: "In more than 30 states, ADUs are now covered by some form of statewide enabling law, which means your city generally can't ban them outright on a single-family lot. California, Washington and Oregon go furthest, capping setbacks, waiving parking requirements near transit and forcing fast permit turnarounds. In states without a statewide law, the answer depends entirely on your local zoning code, and it's worth checking before you spend money on plans." },
+    { type: "cta", text: "Check your state's specific ADU rules and size limits", href: "/states" },
+    { type: "h2", text: "The process, in five stages" },
+    { type: "p", text: "Every ADU project moves through roughly the same sequence, whatever state you're in. First comes feasibility: confirming your lot, zoning and setbacks actually allow a unit before you spend a dollar on design. Then design, where a designer or architect draws plans that meet both the building code and your local ADU ordinance. Third is permitting, where the city plan-checks those drawings and issues a building permit, a process California law now caps at 60 days for a compliant ADU. Fourth is construction itself, which typically runs four to eight months for a detached unit and considerably less for a garage conversion. Last is final inspection and occupancy, after which the unit is legally habitable and can be rented, sold with the property or occupied by family." },
+    { type: "h2", text: "Why ADUs are having a moment right now" },
+    { type: "p", text: "This isn't a niche trend anymore. A permit-data analysis published by Shovels.ai in October 2025 found more than 2.8 million ADU permits issued nationwide since tracking began, with California and Florida together accounting for roughly half of all activity since 2018. California alone has gone from ADUs making up about 5% of new homes completed in 2018 to over 20% by 2023, according to state housing data, driven almost entirely by the law changes described above." },
+    { type: "p", text: "Two forces are pushing that growth. Homeowners are using ADUs to house aging parents or adult children without giving up privacy, a trend housing researchers tie to the rise in multigenerational households. And with rents climbing faster than incomes in most metro areas, a backyard unit that can bring in $1,500 to $2,500 a month has become one of the few home improvements that pays for itself." },
+    { type: "p", text: "“You're building a home despite the fact that it's small,” says Andrei Pogany, principal of Pogany Architecture, describing why ADU projects carry the same design and code complexity as a full house even at a fraction of the size. Electrical, plumbing, egress and insulation all still apply. There's no shortcut just because the footprint is smaller." },
+    { type: "h2", text: "Frequently asked questions" },
+    { type: "h2", text: "Is a granny flat the same as an ADU?" },
+    { type: "p", text: "Yes. Granny flat, casita, in-law suite and ADU all describe the same self-contained second home on a residential lot. ADU is simply the term used in building codes and zoning law." },
+    { type: "h2", text: "How big can an ADU be?" },
+    { type: "p", text: "Most states cap a full ADU between 800 and 1,200 sq ft, though a handful allow more. A junior ADU is capped much lower, usually at 500 sq ft, because it has to fit inside the existing home." },
+    { type: "h2", text: "Do I need a permit to build an ADU?" },
+    { type: "p", text: "Yes, in every state. An ADU requires the same building, electrical and plumbing permits as any habitable structure. Building one without permits creates resale and insurance problems down the line, even if it initially goes unnoticed." },
+    { type: "h2", text: "Can I rent out my ADU?" },
+    { type: "p", text: "In most states, yes, without living on the property yourself. The main exception is a junior ADU, where owner-occupancy of either unit is typically required." },
+    { type: "h2", text: "Does building an ADU increase my property taxes?" },
+    { type: "p", text: "Usually, yes, because the new structure gets assessed separately in most states, adding to your property's taxable value. The exact increase depends on your local assessor and the size and finish level of the unit." },
+    { type: "cta", text: "Get your free ADU cost and feasibility estimate", href: "/" },
+    { type: "p", text: "Rules, size caps and permit processes vary by city and state and change often. Confirm the current requirements with your local planning department before finalizing any ADU design." },
+  ],
+  faq: [
+    { q: "Is a granny flat the same as an ADU?", a: "Yes. Granny flat, casita, in-law suite and ADU all describe the same self-contained second home on a residential lot. ADU is simply the term used in building codes and zoning law." },
+    { q: "How big can an ADU be?", a: "Most states cap a full ADU between 800 and 1,200 sq ft, though a handful allow more. A junior ADU is capped much lower, usually at 500 sq ft, because it has to fit inside the existing home." },
+    { q: "Do I need a permit to build an ADU?", a: "Yes, in every state. An ADU requires the same building, electrical and plumbing permits as any habitable structure. Building one without permits creates resale and insurance problems down the line." },
+    { q: "Can I rent out my ADU?", a: "In most states, yes, without living on the property yourself. The main exception is a junior ADU, where owner-occupancy of either unit is typically required." },
+    { q: "Does building an ADU increase my property taxes?", a: "Usually, yes, because the new structure gets assessed separately in most states, adding to your property's taxable value. The exact increase depends on your local assessor and the size and finish level of the unit." },
+  ],
+});

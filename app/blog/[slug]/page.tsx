@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { POSTS, getPost, relatedPosts, type Block } from "@/lib/posts";
@@ -23,7 +24,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: post.title,
     description: post.description,
     alternates: { canonical: `${site.url}/blog/${post.slug}` },
-    openGraph: { title: post.title, description: post.description, url: `${site.url}/blog/${post.slug}`, type: "article" },
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      url: `${site.url}/blog/${post.slug}`,
+      type: "article",
+      images: [{ url: `${site.url}${post.image}`, width: 1200, height: 800, alt: post.imageAlt }],
+    },
   };
 }
 
@@ -43,6 +50,30 @@ function renderBlock(block: Block, i: number) {
           {block.text} →
         </Link>
       );
+    case "table":
+      return (
+        <div key={i} className="mt-6 overflow-x-auto">
+          {block.caption ? <p className="mb-2 text-sm font-medium text-slate-700">{block.caption}</p> : null}
+          <table className="w-full border-collapse text-left text-sm">
+            <thead>
+              <tr className="border-b border-slate-200">
+                {block.headers.map((h, hi) => (
+                  <th key={hi} className="py-2 pr-4 font-semibold text-slate-900">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {block.rows.map((row, ri) => (
+                <tr key={ri} className="border-b border-slate-100">
+                  {row.map((cell, ci) => (
+                    <td key={ci} className="py-2 pr-4 text-slate-700">{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
     default:
       return <p key={i} className="mt-4 leading-relaxed text-slate-700">{block.text}</p>;
   }
@@ -55,7 +86,7 @@ export default async function BlogPost({ params }: Props) {
 
   const articleLd = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     headline: post.title,
     description: post.description,
     datePublished: post.date,
@@ -64,9 +95,20 @@ export default async function BlogPost({ params }: Props) {
     mainEntityOfPage: `${site.url}/blog/${post.slug}`,
   };
 
+  const faqLd = post.faq && post.faq.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: post.faq.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  } : null;
+
   return (
     <article className="mx-auto max-w-3xl">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
+      {faqLd ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} /> : null}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd([
         { name: "Home", url: site.url },
         { name: "Guides", url: `${site.url}/blog` },
@@ -79,6 +121,9 @@ export default async function BlogPost({ params }: Props) {
       </nav>
       <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">{post.title}</h1>
       <p className="mt-2 text-sm text-slate-500">{post.readingMinutes} min read</p>
+      <div className="relative mt-6 h-64 w-full overflow-hidden rounded-2xl sm:h-96">
+        <Image src={post.image} alt={post.imageAlt} fill sizes="(min-width: 768px) 768px, 100vw" className="object-cover" priority />
+      </div>
       <div className="mt-6">{post.blocks.map(renderBlock)}</div>
       <div className="mt-10 rounded-2xl bg-slate-900 p-6 text-center text-white">
         <p className="font-semibold">Find out what your ADU will cost</p>

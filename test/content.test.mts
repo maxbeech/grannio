@@ -19,7 +19,7 @@ check("at least 10 posts", POSTS.length >= 10, `got ${POSTS.length}`);
 check("post slugs unique", new Set(POSTS.map((p) => p.slug)).size === POSTS.length);
 check("post keywords unique", new Set(POSTS.map((p) => p.keyword)).size === POSTS.length);
 
-const validTypes = new Set(["p", "h2", "ul", "cta"]);
+const validTypes = new Set(["p", "h2", "ul", "cta", "table"]);
 for (const p of POSTS) {
   check(`${p.slug}: slug url-safe`, /^[a-z0-9-]+$/.test(p.slug));
   check(`${p.slug}: title 20-70 chars`, p.title.length >= 20 && p.title.length <= 70, `len ${p.title.length}`);
@@ -38,6 +38,18 @@ for (const p of POSTS) {
     if (b.type === "cta") check(`${p.slug}: CTA href internal`, b.href.startsWith("/"), b.href);
     if (b.type === "p") check(`${p.slug}: paragraph non-empty`, b.text.trim().length > 20);
     if (b.type === "ul") check(`${p.slug}: list non-empty`, b.items.length >= 2);
+    if (b.type === "table") {
+      check(`${p.slug}: table has headers`, b.headers.length >= 2);
+      check(`${p.slug}: table has rows`, b.rows.length >= 2);
+      check(`${p.slug}: table rows match header width`, b.rows.every((r) => r.length === b.headers.length));
+    }
+  }
+  if (p.faq) {
+    check(`${p.slug}: faq has 3-5 questions`, p.faq.length >= 3 && p.faq.length <= 5, `got ${p.faq.length}`);
+    for (const f of p.faq) {
+      check(`${p.slug}: faq question non-empty`, f.q.trim().length > 5);
+      check(`${p.slug}: faq answer non-empty`, f.a.trim().length > 20);
+    }
   }
   check(`${p.slug}: getPost round-trips`, getPost(p.slug)?.title === p.title);
 }
