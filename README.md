@@ -5,7 +5,7 @@ state, ADU type and size to instantly see what your city's rules allow (size, se
 parking, owner-occupancy) and what a backyard ADU will cost — built from regional
 construction-cost indices and published statewide ADU statutes.
 
-**Live:** https://grannio.vercel.app · **Domain:** grannio.com (pending)
+**Live:** https://www.grannio.com · **Canonical host:** `www.grannio.com`
 
 ## SEO strategy
 
@@ -22,6 +22,12 @@ All pages are statically generated with canonical URLs, JSON-LD (`Article`/`FAQP
 `BreadcrumbList`), a dynamic Open Graph image (`next/og`), `sitemap.xml` and `robots.txt`.
 Page-template meta titles/descriptions live in `lib/seo.ts` (single source of truth) and
 are length-guarded by tests for every route.
+
+The sitemap deliberately includes only pages with enough independent, verified material for
+search. State pages with a published statewide standard are eligible; city pages require a
+record in `lib/city-guides.ts` with an official municipal source. Other calculator routes stay
+available for visitors but use `noindex` until their local rules have been researched. This avoids
+asking Google to index thin, scaled location variations.
 
 ## Calculator features
 
@@ -112,8 +118,6 @@ npm run build    # static export of all programmatic pages
 - **Resend**: no API key configured yet — sign up, verify a sending domain (or use the
   `onboarding@resend.dev` default for testing), and set `RESEND_API_KEY` in Vercel for lead
   notification emails to actually send.
-- **grannio.com**: confirmed available (`whois` — no match) as of 2026-07-06, not yet
-  purchased/registered. Buy it, point DNS at Vercel, then add it as the project domain.
 - **GitHub/Vercel renames**: both already done via CLI (`gh repo rename`, `vercel project
   rename`) — nothing further needed there.
 

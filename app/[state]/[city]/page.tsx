@@ -7,6 +7,8 @@ import { STATES, findCity, citySlug } from "@/lib/states";
 import { estimateCost, formatUSD, cityCostMultiplier } from "@/lib/cost";
 import { cityMetaTitle, cityMetaDescription, breadcrumbLd } from "@/lib/seo";
 import { site } from "@/lib/site";
+import { getCityGuide } from "@/lib/city-guides";
+import { isCityIndexable } from "@/lib/indexability";
 
 // ISR: prerendered at build and revalidated weekly (604800s) — keeps pages on
 // Vercel's edge cache (Fast Origin Transfer) while staying fresh if data changes.
@@ -27,6 +29,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical: `${site.url}/${hit.state.slug}/${city}` },
+    robots: { index: isCityIndexable(hit.state.slug, city), follow: true },
     openGraph: { title, description, url: `${site.url}/${hit.state.slug}/${city}`, type: "article" },
   };
 }
@@ -36,6 +39,7 @@ export default async function CityPage({ params }: Props) {
   const hit = findCity(state, city);
   if (!hit) notFound();
   const { state: s, city: cityName } = hit;
+  const guide = getCityGuide(s.slug, city);
   const r = s.rules;
   const cityMultiplier = cityCostMultiplier(s.slug, city);
   const example = estimateCost({ stateSlug: s.slug, aduType: "detached", sqft: 700, cityMultiplier });
@@ -100,12 +104,26 @@ export default async function CityPage({ params }: Props) {
 
       <section>
         <h2 className="text-2xl font-bold text-slate-900">What applies in {cityName}</h2>
-        <p className="mt-3 max-w-3xl text-slate-700">{r.summary}</p>
-        <p className="mt-3 text-sm text-slate-500">
-          {r.statewideLaw
-            ? `Because ${s.name} has a statewide ADU law (${r.citation}), ${cityName} must follow these minimums even where its older zoning code is stricter. Confirm fees and design standards with the ${cityName} planning department.`
-            : `Check the ${cityName} planning or building department for ADU size, setback and parking rules before you design.`}
-        </p>
+        {guide ? (
+          <div className="mt-3 max-w-3xl space-y-4 text-slate-700">
+            <p>{guide.summary}</p>
+            <ul className="list-disc space-y-2 pl-5">
+              {guide.facts.map((fact) => <li key={fact}>{fact}</li>)}
+            </ul>
+            <p className="rounded-xl bg-slate-50 p-4 text-sm text-slate-600 ring-1 ring-slate-200">
+              Source checked {guide.reviewedAt}: {" "}
+              <a href={guide.sourceUrl} className="font-medium text-emerald-700 underline underline-offset-2" rel="noreferrer">
+                {guide.sourceTitle}
+              </a>. Rules can change, so confirm your parcel and current application requirements with the city.
+            </p>
+          </div>
+        ) : (
+          <p className="mt-3 max-w-3xl text-slate-700">
+            {r.statewideLaw
+              ? `${s.name}'s statewide standard (${r.citation}) is the starting point, but parcel-level rules, fees and design review are set locally. Confirm those details with ${cityName} before design.`
+              : `We do not yet publish a verified ${cityName} ordinance summary. Use this page for a planning-level cost estimate, then check ${cityName}'s planning or building department for rules that apply to your parcel.`}
+          </p>
+        )}
       </section>
 
       <section>

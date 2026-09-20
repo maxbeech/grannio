@@ -6,6 +6,8 @@ import { POSTS, getPost, type Block } from "../lib/posts.ts";
 import { STATES, citySlug, findCity } from "../lib/states.ts";
 import { ADU_TYPES } from "../lib/cost.ts";
 import { site } from "../lib/site.ts";
+import { CITY_GUIDES, getCityGuide } from "../lib/city-guides.ts";
+import { getIndexableSitemapEntries, isCityIndexable, isStateIndexable } from "../lib/indexability.ts";
 import { stateMetaTitle, stateMetaDescription, cityMetaTitle, cityMetaDescription, costMetaTitle, costMetaDescription } from "../lib/seo.ts";
 
 let pass = 0, fail = 0;
@@ -18,6 +20,28 @@ function check(name: string, cond: boolean, extra = "") {
 check("at least 10 posts", POSTS.length >= 10, `got ${POSTS.length}`);
 check("post slugs unique", new Set(POSTS.map((p) => p.slug)).size === POSTS.length);
 check("post keywords unique", new Set(POSTS.map((p) => p.keyword)).size === POSTS.length);
+
+// --- Canonical host and indexability policy ---
+check("canonical host is HTTPS www", site.url === "https://www.grannio.com", site.url);
+check("content review date is ISO", /^\d{4}-\d{2}-\d{2}$/.test(site.contentLastReviewed), site.contentLastReviewed);
+check("all indexable state pages have statewide primary sources", STATES.filter(isStateIndexable).every((s) => s.rules.statewideLaw));
+check("city guide keys unique", new Set(CITY_GUIDES.map((guide) => `${guide.stateSlug}/${guide.citySlug}`)).size === CITY_GUIDES.length);
+for (const guide of CITY_GUIDES) {
+  check(`${guide.stateSlug}/${guide.citySlug}: official source is HTTPS`, guide.sourceUrl.startsWith("https://"), guide.sourceUrl);
+  check(`${guide.stateSlug}/${guide.citySlug}: source title set`, guide.sourceTitle.length > 20);
+  check(`${guide.stateSlug}/${guide.citySlug}: source review date is ISO`, /^\d{4}-\d{2}-\d{2}$/.test(guide.reviewedAt), guide.reviewedAt);
+  check(`${guide.stateSlug}/${guide.citySlug}: substantive city summary`, guide.summary.length >= 120, `len ${guide.summary.length}`);
+  check(`${guide.stateSlug}/${guide.citySlug}: at least 3 sourced facts`, guide.facts.length >= 3);
+  check(`${guide.stateSlug}/${guide.citySlug}: is indexable`, isCityIndexable(guide.stateSlug, guide.citySlug));
+  check(`${guide.stateSlug}/${guide.citySlug}: guide resolves`, getCityGuide(guide.stateSlug, guide.citySlug) === guide);
+}
+const sitemapEntries = getIndexableSitemapEntries();
+const sitemapUrls = sitemapEntries.map((entry) => entry.url);
+check("sitemap contains only canonical www URLs", sitemapUrls.every((url) => url.startsWith(`${site.url}/`) || url === site.url));
+check("sitemap has no duplicate URLs", new Set(sitemapUrls).size === sitemapUrls.length);
+check("sitemap includes each source-backed city guide", CITY_GUIDES.every((guide) => sitemapUrls.includes(`${site.url}/${guide.stateSlug}/${guide.citySlug}`)));
+check("sitemap excludes an unsourced city page", !sitemapUrls.includes(`${site.url}/georgia/savannah`));
+check("sitemap uses stable review dates", sitemapEntries.filter((entry) => !entry.url.includes("/blog/")).every((entry) => entry.lastModified.toISOString().startsWith(site.contentLastReviewed)));
 
 const validTypes = new Set(["p", "h2", "ul", "cta", "table"]);
 for (const p of POSTS) {

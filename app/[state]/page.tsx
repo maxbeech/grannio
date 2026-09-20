@@ -7,6 +7,7 @@ import { STATES, getState, citySlug } from "@/lib/states";
 import { estimateCost, formatUSD, ADU_TYPES } from "@/lib/cost";
 import { stateMetaTitle, stateMetaDescription, breadcrumbLd } from "@/lib/seo";
 import { site } from "@/lib/site";
+import { isStateIndexable } from "@/lib/indexability";
 
 // ISR: prerendered at build and revalidated weekly (604800s) — keeps pages on
 // Vercel's edge cache (Fast Origin Transfer) while staying fresh if data changes.
@@ -27,6 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title, description,
     alternates: { canonical: `${site.url}/${s.slug}` },
+    robots: { index: isStateIndexable(s), follow: true },
     openGraph: { title, description, url: `${site.url}/${s.slug}`, type: "article" },
   };
 }
