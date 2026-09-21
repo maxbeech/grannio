@@ -186,7 +186,7 @@ for (const p of POSTS) {
 // --- Accuracy regression guards (fabricated statutes the funnel introduced) ---
 const allText = POSTS.map((p) =>
   [p.title, p.description, ...p.blocks.flatMap((b) =>
-    b.type === "ul" ? b.items : b.type === "cta" ? [b.text] : [b.text]
+    b.type === "ul" ? b.items : b.type === "table" ? b.rows.flat() : [b.text]
   )].join(" ")
 ).join(" ").toLowerCase();
 check("no wrong WA cite 'sb 5258'", !allText.includes("sb 5258"));
