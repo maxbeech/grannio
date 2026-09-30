@@ -35,7 +35,9 @@ check("unset id records nothing and pushes no dataLayer", child);
 process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID = "G-TEST12345";
 const { trackEvent } = await import("../lib/analytics-events.ts");
 check("set id records the event", trackEvent("lead_submitted", { lead_kind: "builder" }) === true);
-check("payload is [event, name, params]", JSON.stringify(win.dataLayer) === '[["event","lead_submitted",{"lead_kind":"builder"}]]', JSON.stringify(win.dataLayer));
+check("payload is [event, name, params]", JSON.stringify((win.dataLayer ?? []).map((c) => Array.from(c as ArrayLike<unknown>))) === '[["event","lead_submitted",{"lead_kind":"builder"}]]', JSON.stringify(win.dataLayer));
+
+check("payload is an arguments object, the only shape gtag.js acts on", Object.prototype.toString.call(win.dataLayer?.[0]) === "[object Arguments]");
 
 console.log(`\n${pass} passed, ${fail} failed`);
 if (fail > 0) process.exit(1);
