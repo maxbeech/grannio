@@ -6,6 +6,8 @@ import { ADU_TYPES, estimateCost, formatUSD, getAduType, type AduType } from "@/
 import { assessFeasibility, type FlagLevel } from "@/lib/feasibility";
 import { estimateRent, estimateRoi, estimateLoanPayment } from "@/lib/income";
 import { site } from "@/lib/site";
+import { trackEvent } from "@/lib/analytics-events";
+import { useOnce } from "@/components/analytics/use-once";
 
 const LEVEL_STYLES: Record<FlagLevel, string> = {
   pass: "bg-emerald-50 text-emerald-800 ring-emerald-100",
@@ -21,6 +23,12 @@ export default function Calculator({ defaultStateSlug, defaultCityMultiplier, sy
   const [lotSqft, setLotSqft] = useState(6000);
   const [nearTransit, setNearTransit] = useState(true);
   const [ownerOccupies, setOwnerOccupies] = useState(true);
+
+  // The free-user moment for a product with no accounts: the first time a visitor changes
+  // an input themselves. Restoring inputs from a shared URL does not go through these.
+  const once = useOnce();
+  const used = (next: { state?: string; type?: AduType }) =>
+    once(() => trackEvent("calculator_used", { state: next.state ?? stateSlug, adu_type: next.type ?? aduType }));
 
   // Shareable results: on mount read inputs from the URL; thereafter reflect changes
   // into the URL (replaceState) so a result can be bookmarked/shared. Home page only.
@@ -68,7 +76,7 @@ export default function Calculator({ defaultStateSlug, defaultCityMultiplier, sy
         <select
           id="adu-state"
           value={stateSlug}
-          onChange={(e) => setStateSlug(e.target.value)}
+          onChange={(e) => { used({ state: e.target.value }); setStateSlug(e.target.value); }}
           className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-emerald-500 focus:outline-none"
         >
           {STATES.map((s) => (
@@ -83,7 +91,7 @@ export default function Calculator({ defaultStateSlug, defaultCityMultiplier, sy
               key={t.slug}
               type="button"
               aria-pressed={aduType === t.type}
-              onClick={() => setAduType(t.type)}
+              onClick={() => { used({ type: t.type }); setAduType(t.type); }}
               className={`rounded-lg border px-3 py-2 text-sm transition ${
                 aduType === t.type
                   ? "border-emerald-500 bg-emerald-50 font-medium text-emerald-800"
@@ -103,7 +111,7 @@ export default function Calculator({ defaultStateSlug, defaultCityMultiplier, sy
           id="adu-size"
           type="range" min={200} max={1200} step={50} value={sqft}
           aria-label="ADU size in square feet"
-          onChange={(e) => setSqft(Number(e.target.value))}
+          onChange={(e) => { used({}); setSqft(Number(e.target.value)); }}
           className="mt-2 w-full accent-emerald-600"
         />
 
@@ -115,17 +123,17 @@ export default function Calculator({ defaultStateSlug, defaultCityMultiplier, sy
           id="lot-size"
           type="range" min={2000} max={20000} step={500} value={lotSqft}
           aria-label="Lot size in square feet"
-          onChange={(e) => setLotSqft(Number(e.target.value))}
+          onChange={(e) => { used({}); setLotSqft(Number(e.target.value)); }}
           className="mt-2 w-full accent-emerald-600"
         />
 
         <div className="mt-4 space-y-2">
           <label className="flex items-center gap-2 text-sm text-slate-700">
-            <input type="checkbox" checked={nearTransit} onChange={(e) => setNearTransit(e.target.checked)} className="accent-emerald-600" />
+            <input type="checkbox" checked={nearTransit} onChange={(e) => { used({}); setNearTransit(e.target.checked); }} className="accent-emerald-600" />
             Within ½ mile of public transit
           </label>
           <label className="flex items-center gap-2 text-sm text-slate-700">
-            <input type="checkbox" checked={ownerOccupies} onChange={(e) => setOwnerOccupies(e.target.checked)} className="accent-emerald-600" />
+            <input type="checkbox" checked={ownerOccupies} onChange={(e) => { used({}); setOwnerOccupies(e.target.checked); }} className="accent-emerald-600" />
             I will live on the property
           </label>
         </div>

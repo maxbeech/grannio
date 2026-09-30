@@ -11,5 +11,4 @@ export function getStripe(): Stripe {
   return cached;
 }
 
-export const REPORT_PRICE_CENTS = 4900;
-export const REPORT_PRICE_CURRENCY = "usd";
+export { REPORT_PRICE_CENTS, REPORT_PRICE_CURRENCY } from "./report-price";

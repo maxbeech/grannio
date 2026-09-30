@@ -120,6 +120,14 @@ npm run build    # static export of all programmatic pages
 - **Stripe webhook**: register the endpoint on the `www` host (`https://www.grannio.com/api/webhooks/stripe`).
   The bare domain 308-redirects to `www` at the ingress and Stripe does not follow redirects.
 
+## Analytics
+
+GA4 through `lib/openhelm-analytics.tsx` (from the shared `openhelm-analytics` service). Unset
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` means no script and no events. Custom events are typed in
+`lib/analytics-events.ts`; `purchase` is decided by `lib/analytics-purchase.ts` from the Stripe session
+the success page retrieves. There are no accounts, so no `oh_user_ref` is sent. Tests:
+`test/analytics.test.mts`, `test/analytics-track.test.mts`.
+
 ## Data & disclaimers
 
 Cost figures are planning estimates from 2024–2025 ADU cost ranges scaled by a regional
