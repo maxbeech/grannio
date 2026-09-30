@@ -5,6 +5,8 @@ import { FINANCING_PARTNERS } from "@/lib/financing-partners";
 import { isValidEmail } from "@/lib/lead";
 import { site } from "@/lib/site";
 import { submitLead } from "@/components/lead-submit";
+import { trackEvent } from "@/lib/analytics-events";
+import { useOnce } from "@/components/analytics/use-once";
 
 const inputClass =
   "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-emerald-500 focus:outline-none";
@@ -12,6 +14,7 @@ const inputClass =
 export default function FinancingSection() {
   const [status, setStatus] = useState<"idle" | "submitting" | "sent" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  const once = useOnce();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -20,6 +23,7 @@ export default function FinancingSection() {
     if (!isValidEmail(email)) {
       setStatus("error");
       setError("Please enter a valid email.");
+      trackEvent("lead_failed", { lead_kind: "financing", reason: "invalid_email" });
       return;
     }
     const amountDigits = String(f.get("financingAmount") || "").replace(/[^0-9]/g, "");
@@ -34,10 +38,13 @@ export default function FinancingSection() {
       timeline: String(f.get("timeline") || ""),
       sourcePath: window.location.pathname,
     });
-    if (result.ok) setStatus("sent");
-    else {
+    if (result.ok) {
+      setStatus("sent");
+      trackEvent("lead_submitted", { lead_kind: "financing" });
+    } else {
       setStatus("error");
       setError(result.error || "Something went wrong.");
+      trackEvent("lead_failed", { lead_kind: "financing", reason: result.code ?? "unknown" });
     }
   }
 
@@ -69,7 +76,10 @@ export default function FinancingSection() {
         <p className="mt-1 text-sm text-slate-600">
           Tell us roughly what you need to borrow and we&apos;ll point you to lenders who work with ADU projects.
         </p>
-        <form onSubmit={handleSubmit} className="mt-4 grid gap-3 sm:grid-cols-2">
+        <form
+        onSubmit={handleSubmit}
+        onFocus={() => once(() => trackEvent("lead_form_started", { lead_kind: "financing" }))}
+        className="mt-4 grid gap-3 sm:grid-cols-2">
           <div>
             <label htmlFor="fin-name" className="block text-sm font-medium text-slate-700">Name</label>
             <input id="fin-name" name="name" type="text" autoComplete="name" className={inputClass} placeholder="Jane Homeowner" />

@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-30
+
+- Instrumented user journeys for OpenHelm. Refreshed `lib/openhelm-analytics*` from the shared service and added
+  the events OpenHelm reads: `calculator_used`, `report_form_started`, `begin_checkout`, `checkout_failed`,
+  `checkout_cancelled`, `purchase`, `purchase_confirmation_failed`, `lead_form_started`, `lead_submitted` and
+  `lead_failed`. All go through the typed map in `lib/analytics-events.ts`; nothing is sent unless
+  `NEXT_PUBLIC_GA_MEASUREMENT_ID` is set. Failure events carry a short code (`http_502`, `network_error`), never text.
+- `purchase` is sent by the `/report/success` page only after the server confirms the Stripe Checkout Session is
+  paid, one-off and for the $49 report. It fires once per session id per browser. Grannio has no accounts, so
+  there is no `oh_user_ref` or `oh_plan`; visitors stay anonymous.
+- Moved the report price constants to `lib/report-price.ts` (re-exported from `lib/stripe.ts`) so client code can
+  read them without bundling Stripe.
+
 ## 2026-09-30: Hosting moved from Vercel to Helm7
 
 - Runs on Helm7 (a Next.js image built from `master`, on the Falkenstein node) instead of

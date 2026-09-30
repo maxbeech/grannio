@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { getStripe } from "@/lib/stripe";
+import { checkPurchase } from "@/lib/analytics-purchase";
+import PurchaseTracker from "@/components/analytics/PurchaseTracker";
 
 // Dynamic on purpose — reads the Stripe session for this specific visitor at request
 // time, so it can only show a real confirmation once Stripe itself confirms payment
@@ -17,11 +19,13 @@ type Props = { searchParams: Promise<{ session_id?: string }> };
 export default async function ReportSuccessPage({ searchParams }: Props) {
   const { session_id: sessionId } = await searchParams;
   const session = sessionId ? await fetchSession(sessionId) : null;
+  const purchase = checkPurchase(sessionId, session);
   const paid = session?.payment_status === "paid";
   const email = session?.customer_details?.email || session?.customer_email || undefined;
 
   return (
     <div className="mx-auto max-w-xl space-y-6 text-center">
+      <PurchaseTracker check={purchase} />
       {paid ? (
         <>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Payment received</h1>

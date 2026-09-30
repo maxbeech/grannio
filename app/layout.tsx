@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import "./globals.css";
 import { site } from "@/lib/site";
 import { OpenHelmAnalytics } from "../lib/openhelm-analytics";
+import CheckoutCancelledTracker from "@/components/analytics/CheckoutCancelledTracker";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -60,6 +62,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </div>
         </footer>
         <OpenHelmAnalytics />
+        <Suspense fallback={null}>
+          <CheckoutCancelledTracker />
+        </Suspense>
       </body>
     </html>
   );
