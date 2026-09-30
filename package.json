@@ -5,10 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "deploy": "npx vercel pull --yes --environment=production && npx vercel build --prod && npx vercel deploy --prebuilt --prod",
-    "start": "next start",
+    "start": "next start -p ${PORT:-3000}",
     "lint": "eslint",
-    "test": "tsx test/engine.test.mts && tsx test/content.test.mts"
+    "test": "tsx test/engine.test.mts && tsx test/content.test.mts && tsx test/no-vercel.test.mts"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.71.0",

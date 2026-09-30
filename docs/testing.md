@@ -30,9 +30,8 @@ Continuous user journey + isolated checks, all PASS:
   requests → 30×200, avg 0.6s**
 
 ## Deliberately not load-tested at scale
-The site is fully static + ISR served from Vercel's global edge CDN. High-RPS load testing
-would exercise Vercel's CDN, not our code, and provides no signal — the concurrency burst
-above confirms consistent edge delivery.
+The site is fully static + ISR. It was load-tested while hosted on Vercel's edge CDN; it now runs
+on a single Helm7 node behind Cloudflare, so the burst above no longer describes its capacity.
 
 ## 2026-07-06 — Lead-capture backend + rebrand
 
@@ -68,6 +67,6 @@ above confirms consistent edge delivery.
 3. **Screen readers (VoiceOver / NVDA / JAWS)** — axe-core covers programmatic semantics
    (labels, roles, names, contrast); do a manual pass with a real screen reader for flow/announcements.
 4. **Live Resend + Supabase smoke test** — once `RESEND_API_KEY` (and later `SUPABASE_URL`
-   / `SUPABASE_SERVICE_ROLE_KEY`) are set in Vercel, submit each of the three lead forms
+   / `SUPABASE_SERVICE_ROLE_KEY`) are set as Helm7 variables, submit each of the three lead forms
    for real and confirm the notification email actually arrives and (once Supabase is
    connected) a row appears in the `leads` table.

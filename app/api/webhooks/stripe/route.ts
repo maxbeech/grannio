@@ -7,7 +7,7 @@ import { buildLeadNotificationText, leadEmailSubject, type LeadPayload } from "@
 import { getStripe, REPORT_PRICE_CENTS, REPORT_PRICE_CURRENCY } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
-// Vercel Function (Node.js runtime — Stripe signature verification needs Node crypto, not
+// Node.js route handler (Stripe signature verification needs Node crypto, not
 // edge). Source of truth for report payments: the checkout route only *starts* a Stripe
 // Checkout Session, this webhook is what actually confirms money changed hands before a
 // lead is recorded or any "your report is on its way" email goes out.

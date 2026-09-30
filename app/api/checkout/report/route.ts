@@ -4,7 +4,7 @@ import { isValidEmail } from "@/lib/lead";
 import { getStripe, REPORT_PRICE_CENTS, REPORT_PRICE_CURRENCY } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
-// Vercel Function (Node.js runtime) — creates a real Stripe Checkout Session for the $49
+// Node.js route handler — creates a real Stripe Checkout Session for the $49
 // detailed feasibility report. Never fakes success: the client only redirects once Stripe
 // actually returns a session URL. The webhook (app/api/webhooks/stripe/route.ts) is the
 // source of truth for payment confirmation — this route just starts the transaction.

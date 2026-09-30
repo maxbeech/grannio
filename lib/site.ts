@@ -3,7 +3,7 @@ export const site = {
   name: "Grannio",
   domain: "grannio.com",
   // www is the public origin. Keeping it here makes metadata, JSON-LD, robots and
-  // the sitemap agree with the permanent apex → www redirect configured on Vercel.
+  // the sitemap agree with the permanent apex → www redirect at the hosting ingress.
   url: "https://www.grannio.com",
   // Update this only when the shared editorial/rules dataset changes. A stable
   // value avoids making every sitemap URL look newly edited on each regeneration.
