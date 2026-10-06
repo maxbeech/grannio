@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { site } from "@/lib/site";
+import { captureServerError, captureServerMessage } from "@/lib/observability";
 import { sendEmail } from "@/lib/openhelm-mail";
 import { buildLeadNotificationText, leadEmailSubject, type LeadPayload } from "@/lib/lead";
 import { getStripe, REPORT_PRICE_CENTS, REPORT_PRICE_CURRENCY } from "@/lib/stripe";
@@ -16,7 +17,7 @@ export const runtime = "nodejs";
 export async function POST(request: Request) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!webhookSecret) {
-    console.error("[api/webhooks/stripe] STRIPE_WEBHOOK_SECRET is not set.");
+    captureServerMessage("STRIPE_WEBHOOK_SECRET is not set", { scope: "api/webhooks/stripe", step: "config" });
     return NextResponse.json({ error: "Webhook not configured." }, { status: 503 });
   }
 
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
     if (!signature) throw new Error("Missing stripe-signature header.");
     event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
   } catch (err) {
-    console.error("[api/webhooks/stripe] Signature verification failed:", err);
+    captureServerError(err, { scope: "api/webhooks/stripe", step: "signature_verification" });
     return NextResponse.json({ error: "Invalid signature." }, { status: 400 });
   }
 
@@ -57,7 +58,7 @@ export async function POST(request: Request) {
 async function handlePaidSession(session: Stripe.Checkout.Session, supabase: SupabaseClient | null) {
   const email = session.customer_details?.email || session.customer_email;
   if (!email) {
-    console.error("[api/webhooks/stripe] Paid session has no email:", session.id);
+    captureServerMessage("Paid session has no email", { scope: "api/webhooks/stripe", step: "paid_session", sessionId: session.id });
     return;
   }
   const metadata = session.metadata || {};
@@ -119,7 +120,7 @@ async function handlePaidSession(session: Stripe.Checkout.Session, supabase: Sup
       await supabase.from("report_orders").update({ lead_id: lead.id }).eq("stripe_session_id", session.id);
     }
   } else {
-    console.error("[api/webhooks/stripe] Supabase not configured — paid report order not persisted:", session.id);
+    captureServerMessage("Supabase not configured: paid report order not persisted", { scope: "api/webhooks/stripe", step: "persist_order", sessionId: session.id });
   }
 
   const leadPayload: LeadPayload = {
@@ -147,7 +148,7 @@ async function sendNotificationEmail(payload: LeadPayload) {
     clientId: `grannio-lead-notify:${payload.email}:${payload.kind}`,
   });
   if (!result.sent && result.reason === "error") {
-    console.error("[api/webhooks/stripe] Notification email failed:", result.error);
+    captureServerMessage("Notification email failed", { scope: "api/webhooks/stripe", step: "notify_email" });
   }
 }
 
@@ -167,6 +168,6 @@ async function sendCustomerConfirmation(email: string, name?: string) {
     clientId: `grannio-confirm:${email}`,
   });
   if (!result.sent && result.reason === "error") {
-    console.error("[api/webhooks/stripe] Customer confirmation email failed:", result.error);
+    captureServerMessage("Customer confirmation email failed", { scope: "api/webhooks/stripe", step: "customer_email" });
   }
 }

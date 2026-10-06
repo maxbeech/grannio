@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { site } from "@/lib/site";
+import { captureServerError } from "@/lib/observability";
 import { isValidEmail } from "@/lib/lead";
 import { getStripe, REPORT_PRICE_CENTS, REPORT_PRICE_CURRENCY } from "@/lib/stripe";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
@@ -98,11 +99,11 @@ export async function POST(request: Request) {
     });
     // Don't block checkout on this — the webhook can still confirm the payment from
     // Stripe's own record even if this pending row failed to write.
-    if (error) console.error("[api/checkout/report] Supabase insert failed:", error);
+    if (error) captureServerError(error, { scope: "api/checkout/report", step: "pending_order_insert", code: error.code });
 
     return NextResponse.json({ ok: true, url: session.url });
   } catch (err) {
-    console.error("[api/checkout/report] Stripe session creation failed:", err);
+    captureServerError(err, { scope: "api/checkout/report", step: "stripe_session_create" });
     return NextResponse.json(
       { ok: false, error: "We couldn't start checkout just now — please email us directly." },
       { status: 502 }

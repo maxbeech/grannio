@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { site } from "@/lib/site";
+import { captureServerError, captureServerMessage } from "@/lib/observability";
 import { validateLeadPayload, buildLeadNotificationText, leadEmailSubject, type LeadPayload } from "@/lib/lead";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { sendEmail, emailEnabled } from "@/lib/openhelm-mail";
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
       if (error) throw error;
       stored = true;
     } catch (err) {
-      console.error("[api/lead] Supabase insert failed:", err);
+      captureServerError(err, { scope: "api/lead", step: "supabase_insert", kind: payload.kind });
     }
   }
 
@@ -80,10 +81,11 @@ export async function POST(request: Request) {
     // "Held for approval" is not delivery: leave `emailed` false so the caller
     // still depends on the Supabase write for its success claim.
     emailed = result.sent && result.status !== "pending_approval";
-    if (!result.sent) console.error("[api/lead] mail send failed:", result.error ?? result.reason);
+    if (!result.sent) captureServerMessage("Lead notification email failed", { scope: "api/lead", step: "mail_send", reason: result.reason, kind: payload.kind });
   }
 
   if (!stored && !emailed) {
+    captureServerMessage("Lead was neither stored nor emailed", { scope: "api/lead", kind: payload.kind, stored, emailed });
     return NextResponse.json(
       { ok: false, error: "We couldn't submit that just now — please email us directly." },
       { status: 502 }

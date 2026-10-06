@@ -140,6 +140,13 @@ GA4 through `lib/openhelm-analytics.tsx` (from the shared `openhelm-analytics` s
 the success page retrieves. There are no accounts, so no `oh_user_ref` is sent. Tests:
 `test/analytics.test.mts`, `test/analytics-track.test.mts`.
 
+## Error tracking and feedback
+
+Sentry project `grannio_web` (org `maxed-labs`) collects errors, logs and user feedback. Set `NEXT_PUBLIC_SENTRY_DSN`
+and `SENTRY_DSN` as Helm7 variables (see `.env.example`); without them nothing is reported and the feedback link says
+so. Everything sent passes through `lib/scrub.ts`. Server code reports problems with `captureServerError` from
+`lib/observability.ts`: pass ids, codes and counts only, never names, emails or free text.
+
 ## Data & disclaimers
 
 Cost figures are planning estimates from 2024–2025 ADU cost ranges scaled by a regional

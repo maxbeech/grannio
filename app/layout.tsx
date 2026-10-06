@@ -5,6 +5,7 @@ import "./globals.css";
 import { site } from "@/lib/site";
 import { OpenHelmAnalytics } from "../lib/openhelm-analytics";
 import CheckoutCancelledTracker from "@/components/analytics/CheckoutCancelledTracker";
+import FeedbackButton from "@/components/FeedbackButton";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <Link href="/california" className="hover:text-slate-900">California</Link>
               <Link href="/states" className="hover:text-slate-900">All states</Link>
               <Link href="/blog" className="hover:text-slate-900">Guides</Link>
+              <FeedbackButton className="hidden hover:text-slate-900 sm:inline" label="Feedback" />
               <Link href="/#report" className="rounded-lg bg-slate-900 px-3 py-1.5 font-medium text-white hover:bg-slate-700">
                 Feasibility report
               </Link>
@@ -57,6 +59,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
               <Link href="/states" className="text-slate-500 hover:text-slate-900">ADU rules by state</Link>
               <Link href="/blog" className="text-slate-500 hover:text-slate-900">Guides</Link>
               <Link href="/methodology" className="text-slate-500 hover:text-slate-900">Methodology</Link>
+              <FeedbackButton className="text-slate-500 hover:text-slate-900" />
             </p>
             <p className="mt-4 text-xs text-slate-500">© 2026 {site.name}. All rights reserved.</p>
           </div>

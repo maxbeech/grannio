@@ -4,6 +4,18 @@
 
 - Refreshed the editorial collection’s rolling publication dates for the current seven-day window.
 
+## 2026-10-06: Sentry standard
+
+- Errors, logs and user feedback now go to the `grannio_web` Sentry project. One shared options helper
+  (`lib/sentry-options.ts`) drives the browser, server and edge inits; the old `sentry.*.config.ts` files are gone.
+- Console output is forwarded as Sentry logs. A single scrubber (`lib/scrub.ts`) redacts emails, phone numbers,
+  tokens, API keys and secret fields in events, logs, breadcrumbs and transactions. It is linear-time, truncates
+  long strings, and drops the item rather than sending it raw if scrubbing fails. Query strings are stripped from URLs.
+- Failures that used to be a `console.error` (lead capture, Stripe checkout and webhook, report success page) now
+  raise a Sentry issue through `captureServerError`, with ids and codes only. Added `error.tsx` and `global-error.tsx`.
+- A "Feedback" link in the header and a "Send feedback" link in the footer open Sentry's feedback form. Browser
+  traffic goes through a randomised tunnel route so ad blockers do not drop it.
+
 ## 2026-09-30
 
 - Refreshed the September collection’s publication dates into the active seven-day editorial window.
