@@ -31,13 +31,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: "article",
       images: [{ url: `${site.url}${post.image}`, width: 1200, height: 800, alt: post.imageAlt }],
     },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.description,
+      images: [{ url: `${site.url}${post.image}`, alt: post.imageAlt }],
+    },
   };
 }
 
 function renderBlock(block: Block, i: number) {
   switch (block.type) {
     case "h2":
-      return <h2 key={i} className="mt-8 text-xl font-semibold text-slate-900">{block.text}</h2>;
+      return <h2 key={i} id={`section-${i}`} className="scroll-mt-6 mt-8 text-xl font-semibold text-slate-900">{block.text}</h2>;
     case "ul":
       return (
         <ul key={i} className="mt-3 list-disc space-y-1.5 pl-5 text-slate-700">
@@ -104,6 +110,9 @@ export default async function BlogPost({ params }: Props) {
       acceptedAnswer: { "@type": "Answer", text: f.a },
     })),
   } : null;
+  const contents = post.blocks
+    .map((block, index) => block.type === "h2" ? { text: block.text, id: `section-${index}` } : null)
+    .filter((item): item is { text: string; id: string } => item !== null);
 
   return (
     <article className="mx-auto max-w-3xl">
@@ -119,12 +128,34 @@ export default async function BlogPost({ params }: Props) {
         <Link href="/blog" className="hover:text-slate-900">Guides</Link> <span className="px-1">/</span>
         <span className="text-slate-700">{post.title}</span>
       </nav>
+      {post.category ? <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-emerald-700">{post.category}</p> : null}
       <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">{post.title}</h1>
       <p className="mt-2 text-sm text-slate-500">{post.readingMinutes} min read</p>
       <div className="relative mt-6 h-64 w-full overflow-hidden rounded-2xl sm:h-96">
         <Image src={post.image} alt={post.imageAlt} fill sizes="(min-width: 768px) 768px, 100vw" className="object-cover" priority />
       </div>
+      {contents.length >= 3 ? (
+        <nav aria-label="On this page" className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-5">
+          <p className="text-sm font-semibold text-slate-900">On this page</p>
+          <ol className="mt-2 space-y-1 text-sm text-emerald-800">
+            {contents.map((item) => <li key={item.id}><a className="hover:underline" href={`#${item.id}`}>{item.text}</a></li>)}
+          </ol>
+        </nav>
+      ) : null}
       <div className="mt-6">{post.blocks.map(renderBlock)}</div>
+      {post.sources && post.sources.length > 0 ? (
+        <section className="mt-10 border-t border-slate-200 pt-6" aria-labelledby="sources-heading">
+          <h2 id="sources-heading" className="text-lg font-semibold text-slate-900">Sources and further reading</h2>
+          <ul className="mt-3 space-y-2 text-sm text-slate-700">
+            {post.sources.map((source) => (
+              <li key={source.href}>
+                <a href={source.href} className="font-medium text-emerald-700 hover:underline" rel="noreferrer" target="_blank">{source.name}</a>
+                <span>: {source.note}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       <div className="mt-10 rounded-2xl bg-slate-900 p-6 text-center text-white">
         <p className="font-semibold">Find out what your ADU will cost</p>
         <Link href="/" className="mt-3 inline-block rounded-xl bg-emerald-700 px-5 py-2.5 font-medium text-white hover:bg-emerald-600">Open the calculator →</Link>

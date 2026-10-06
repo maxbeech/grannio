@@ -30,9 +30,10 @@ export default function BlogIndex() {
               <Image src={p.image} alt={p.imageAlt} fill sizes="(min-width: 640px) 50vw, 100vw" className="object-cover" />
             </div>
             <div className="p-6">
+              {p.category ? <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">{p.category}</p> : null}
               <h2 className="text-lg font-semibold text-slate-900">{p.title}</h2>
               <p className="mt-2 text-sm text-slate-600">{p.description}</p>
-              <p className="mt-3 text-xs text-slate-500">{p.readingMinutes} min read</p>
+              <p className="mt-3 text-xs text-slate-500">{p.date} · {p.readingMinutes} min read</p>
             </div>
           </Link>
         ))}

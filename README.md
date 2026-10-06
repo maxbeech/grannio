@@ -29,6 +29,18 @@ record in `lib/city-guides.ts` with an official municipal source. Other calculat
 available for visitors but use `noindex` until their local rules have been researched. This avoids
 asking Google to index thin, scaled location variations.
 
+### Editorial collection
+
+The code-backed blog includes a 15-post collection targeting the plan’s cost-by-size,
+plans/design, rules/permits, financing/ROI and adjacent-dwelling clusters. Each record includes a
+primary keyword, six supporting terms, a current publication date, descriptive image alt text,
+official sources, a decision table, FAQ data, a practical CTA and 1,200–2,500 words of rendered
+copy. `SEPTEMBER_POSTS` is exported from `lib/posts.ts` and is covered by the content test so the
+batch cannot silently gain duplicate or underspecified posts. The shared App Router template adds
+canonical, Open Graph, Twitter, BlogPosting, FAQ and breadcrumb metadata; it also renders source
+links, an on-page contents list and three related guides. As with all posts in `POSTS`, the index,
+static paths and sitemap are generated automatically from the same registry.
+
 ## Calculator features
 
 - Cost estimate by state × ADU type × size, with a **hard / soft / site cost breakdown**

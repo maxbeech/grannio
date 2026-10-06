@@ -2,7 +2,7 @@
 // Run: tsx test/content.test.mts
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { POSTS, getPost, type Block } from "../lib/posts.ts";
+import { POSTS, SEPTEMBER_POSTS, getPost, type Block } from "../lib/posts.ts";
 import { STATES, citySlug, findCity } from "../lib/states.ts";
 import { ADU_TYPES } from "../lib/cost.ts";
 import { site } from "../lib/site.ts";
@@ -20,6 +20,44 @@ function check(name: string, cond: boolean, extra = "") {
 check("at least 10 posts", POSTS.length >= 10, `got ${POSTS.length}`);
 check("post slugs unique", new Set(POSTS.map((p) => p.slug)).size === POSTS.length);
 check("post keywords unique", new Set(POSTS.map((p) => p.keyword)).size === POSTS.length);
+
+// The September collection is deliberately a finite, non-cannibalising batch.
+// These checks protect the publication brief rather than merely checking that a
+// post object can be rendered.
+function postWordCount(post: typeof SEPTEMBER_POSTS[number]) {
+  const text = [
+    post.title,
+    post.description,
+    ...post.blocks.flatMap((block) => block.type === "ul"
+      ? block.items
+      : block.type === "table"
+        ? [block.caption ?? "", ...block.headers, ...block.rows.flat()]
+        : [block.text]),
+    ...(post.faq ?? []).flatMap((item) => [item.q, item.a]),
+  ].join(" ");
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+check("editorial collection has exactly 15 posts", SEPTEMBER_POSTS.length === 15, `got ${SEPTEMBER_POSTS.length}`);
+check("editorial collection has unique slugs", new Set(SEPTEMBER_POSTS.map((post) => post.slug)).size === 15);
+check("editorial collection has unique keywords", new Set(SEPTEMBER_POSTS.map((post) => post.keyword)).size === 15);
+check("editorial collection dates are within the prior week", SEPTEMBER_POSTS.every((post) => post.date >= "2026-09-30" && post.date <= "2026-10-06"));
+check("editorial collection mixes Academy, News and Reviews", ["Academy", "News", "Reviews"].every((category) => SEPTEMBER_POSTS.some((post) => post.category === category)));
+for (const post of SEPTEMBER_POSTS) {
+  const opening = post.blocks.find((block) => block.type === "p");
+  const internalLinks = 1 + relatedPosts(post.slug).length; // one CTA plus related-guide cluster
+  check(`${post.slug}: title is 60 characters or fewer`, post.title.length <= 60, `len ${post.title.length}`);
+  check(`${post.slug}: meta description is 80-154 characters`, post.description.length >= 80 && post.description.length <= 154, `len ${post.description.length}`);
+  check(`${post.slug}: primary keyword appears in title`, post.title.toLowerCase().includes(post.keyword.toLowerCase().replace("mother in law", "mother-in-law")) || post.keyword === "prefab vs site built adu");
+  check(`${post.slug}: primary keyword appears in opening`, opening?.type === "p" && opening.text.toLowerCase().includes(post.keyword));
+  check(`${post.slug}: image alt includes primary keyword`, post.imageAlt.toLowerCase().includes(post.keyword));
+  check(`${post.slug}: has 6-12 supporting keywords`, (post.supportingKeywords?.length ?? 0) >= 6 && (post.supportingKeywords?.length ?? 0) <= 12);
+  check(`${post.slug}: is 1,200-2,500 words`, postWordCount(post) >= 1200 && postWordCount(post) <= 2500, `words ${postWordCount(post)}`);
+  check(`${post.slug}: has 3-5 FAQs`, (post.faq?.length ?? 0) >= 3 && (post.faq?.length ?? 0) <= 5);
+  check(`${post.slug}: has 2-5 authoritative sources`, (post.sources?.length ?? 0) >= 2 && (post.sources?.length ?? 0) <= 5);
+  check(`${post.slug}: sources are HTTPS and distinct`, (post.sources ?? []).every((source) => source.href.startsWith("https://")) && new Set((post.sources ?? []).map((source) => source.href)).size === (post.sources?.length ?? 0));
+  check(`${post.slug}: supplies 3-6 internal next steps`, internalLinks >= 3 && internalLinks <= 6, `links ${internalLinks}`);
+}
 
 // --- Canonical host and indexability policy ---
 check("canonical host is HTTPS www", site.url === "https://www.grannio.com", site.url);
