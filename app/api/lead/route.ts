@@ -4,7 +4,7 @@ import { validateLeadPayload, buildLeadNotificationText, leadEmailSubject, type 
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 import { sendEmail, emailEnabled } from "@/lib/openhelm-mail";
 
-// Vercel Function (Node.js runtime, Fluid Compute) — not cached; every request runs live.
+// Node.js route handler — not cached; every request runs live.
 // Real-data policy: this route never fabricates a success. It only returns { ok: true }
 // once a lead has actually been persisted (Supabase) or actually emailed (OpenHelm Mail). If
 // neither backend is configured it fails loudly with a real error, so the UI can show an

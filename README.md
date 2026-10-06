@@ -75,7 +75,7 @@ renew against. Three lead types feed one backend:
 
 ### Lead capture backend
 
-All three forms POST JSON to `app/api/lead/route.ts` (a Vercel Function, Node.js runtime —
+All three forms POST JSON to `app/api/lead/route.ts` (a Node.js route handler —
 not cached, every request runs live). The route never fakes success:
 
 - **Resend** sends a real notification email if `RESEND_API_KEY` is set (`RESEND_FROM_EMAIL`
@@ -95,12 +95,11 @@ Pure validation/formatting logic (`validateLeadPayload`, `buildLeadNotificationT
 `leadEmailSubject`) lives in `lib/lead.ts`, fully unit-tested alongside the original
 `buildLeadMailto` fallback helpers.
 
-## Vercel / free-tier strategy
+## Rendering and caching
 
 Every route is prerendered at build and uses **ISR with a 1-week `revalidate`** (`604800`s,
-set on each route segment). Pages are served from Vercel's **edge cache** (`x-vercel-cache:
-PRERENDER`) as prerendered HTML with immutable static assets (`max-age=31536000, immutable`)
-— minimal Fast Origin Transfer, near-zero origin compute. The long revalidation window means
+set on each route segment). Pages are served from Next's **ISR cache** as prerendered HTML with immutable static assets
+(`max-age=31536000, immutable`), so origin compute is near zero. The long revalidation window means
 each page regenerates at most once/week (negligible invocations) while staying fresh if the
 underlying data changes and the app is redeployed. There are **no runtime external/API
 calls** (the calculator is pure client-side math), so there are no API failure modes to
@@ -108,7 +107,7 @@ handle.
 
 ## Stack
 
-Next.js 16 (App Router) · React 19 · Tailwind CSS 4 · deployed on Vercel. The calculator
+Next.js 16 (App Router) · React 19 · Tailwind CSS 4 · hosted on Helm7 (Falkenstein), built from `master`. The calculator
 is pure client-side math (`lib/cost.ts`, `lib/feasibility.ts`, `lib/states.ts`) — no DB
 required for the free tier.
 
@@ -125,13 +124,21 @@ npm run build    # static export of all programmatic pages
 ### Manual follow-ups still required
 
 - **Supabase**: a new project/credentials are pending (the previous org hit its 2-project
-  free-tier limit) — once given, set `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` in Vercel
-  and lead persistence turns on automatically.
+  free-tier limit) — once given, set `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` as a Helm7
+  variable and lead persistence turns on automatically.
 - **Resend**: no API key configured yet — sign up, verify a sending domain (or use the
-  `onboarding@resend.dev` default for testing), and set `RESEND_API_KEY` in Vercel for lead
+  `onboarding@resend.dev` default for testing), and set `RESEND_API_KEY` as a Helm7 variable for lead
   notification emails to actually send.
-- **GitHub/Vercel renames**: both already done via CLI (`gh repo rename`, `vercel project
-  rename`) — nothing further needed there.
+- **Stripe webhook**: register the endpoint on the `www` host (`https://www.grannio.com/api/webhooks/stripe`).
+  The bare domain 308-redirects to `www` at the ingress and Stripe does not follow redirects.
+
+## Analytics
+
+GA4 through `lib/openhelm-analytics.tsx` (from the shared `openhelm-analytics` service). Unset
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` means no script and no events. Custom events are typed in
+`lib/analytics-events.ts`; `purchase` is decided by `lib/analytics-purchase.ts` from the Stripe session
+the success page retrieves. There are no accounts, so no `oh_user_ref` is sent. Tests:
+`test/analytics.test.mts`, `test/analytics-track.test.mts`.
 
 ## Data & disclaimers
 

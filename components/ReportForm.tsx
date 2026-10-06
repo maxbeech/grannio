@@ -4,6 +4,9 @@ import { useState } from "react";
 import { ADU_TYPES } from "@/lib/cost";
 import { buildLeadMailto, isValidEmail } from "@/lib/lead";
 import { submitReportCheckout } from "@/components/report-checkout";
+import { trackEvent } from "@/lib/analytics-events";
+import { REPORT_PRICE_CENTS, REPORT_PRICE_CURRENCY } from "@/lib/report-price";
+import { useOnce } from "@/components/analytics/use-once";
 
 // Real checkout: posts to /api/checkout/report, which creates a $49 Stripe Checkout
 // Session, and redirects the browser to Stripe. There is no client-side "submitted!"
@@ -14,6 +17,7 @@ export default function ReportForm() {
   const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [fallback, setFallback] = useState<string | null>(null);
+  const once = useOnce();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -28,22 +32,28 @@ export default function ReportForm() {
     if (!isValidEmail(values.email)) {
       setStatus("error");
       setError("Please enter a valid email so we can send your report.");
+      trackEvent("checkout_failed", { reason: "invalid_email" });
       return;
     }
     setStatus("submitting");
     setError(null);
     const result = await submitReportCheckout({ ...values, sourcePath: window.location.pathname });
     if (result.ok && result.url) {
+      trackEvent("begin_checkout", {
+        currency: REPORT_PRICE_CURRENCY.toUpperCase(),
+        value: REPORT_PRICE_CENTS / 100,
+      });
       window.location.href = result.url;
       return;
     }
     setStatus("error");
     setError(result.error || "Something went wrong.");
+    trackEvent("checkout_failed", { reason: result.ok ? "no_checkout_url" : result.code ?? "unknown" });
     setFallback(buildLeadMailto(values));
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto mt-6 max-w-xl text-left">
+    <form onSubmit={handleSubmit} onFocus={() => once(() => trackEvent("report_form_started", {}))} className="mx-auto mt-6 max-w-xl text-left">
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <label htmlFor="lead-name" className="block text-sm font-medium text-slate-200">Name</label>

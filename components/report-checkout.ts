@@ -1,9 +1,12 @@
 import type { ReportCheckoutPayload } from "@/app/api/checkout/report/route";
+import { analyticsFailureReason } from "@/lib/analytics-events";
 
 export interface CheckoutResult {
   ok: boolean;
   url?: string | null;
   error?: string;
+  /** Short failure code for analytics (`http_502`, `network_error`). */
+  code?: string;
 }
 
 /** POST to /api/checkout/report to start a $49 Stripe Checkout session. Never throws. */
@@ -15,9 +18,9 @@ export async function submitReportCheckout(payload: ReportCheckoutPayload): Prom
       body: JSON.stringify(payload),
     });
     const data = await res.json().catch(() => ({}));
-    if (!res.ok) return { ok: false, error: data.error || "Something went wrong — please try again." };
+    if (!res.ok) return { ok: false, error: data.error || "Something went wrong — please try again.", code: analyticsFailureReason(res.status) };
     return { ok: true, url: data.url };
   } catch {
-    return { ok: false, error: "Network error — please check your connection and try again." };
+    return { ok: false, error: "Network error — please check your connection and try again.", code: analyticsFailureReason(null) };
   }
 }

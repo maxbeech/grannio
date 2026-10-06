@@ -5,7 +5,7 @@ import { STATES } from "@/lib/states";
 import { site } from "@/lib/site";
 
 // ISR: prerendered at build and revalidated weekly (604800s) — keeps pages on
-// Vercel's edge cache (Fast Origin Transfer) while staying fresh if data changes.
+// the ISR cache while staying fresh if data changes.
 export const revalidate = 604800;
 
 export const metadata: Metadata = {
