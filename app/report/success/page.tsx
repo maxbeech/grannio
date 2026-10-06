@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { getStripe } from "@/lib/stripe";
+import { captureServerError } from "@/lib/observability";
 import { checkPurchase } from "@/lib/analytics-purchase";
 import PurchaseTracker from "@/components/analytics/PurchaseTracker";
 
@@ -56,7 +57,7 @@ async function fetchSession(sessionId: string) {
     const stripe = getStripe();
     return await stripe.checkout.sessions.retrieve(sessionId);
   } catch (err) {
-    console.error("[report/success] Failed to retrieve Stripe session:", err);
+    captureServerError(err, { scope: "report/success", step: "retrieve_session" });
     return null;
   }
 }
