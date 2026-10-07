@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-07: Encoded-dot probes get a 404, not a 500
+
+- A scanner requesting `/robots%2etxt` made Next match the `[state]` page and crash on a cache-kind mismatch ("Invariant: app-page handler received invalid cache entry APP_ROUTE"): a 500 and a Sentry issue. `proxy.ts` now answers 404 for any path containing an encoded dot (`%2e`), which no real URL here uses. Covered by `test/proxy.test.mts`.
+
 ## 2026-10-07: Sentry scrubber security pass
 
 - **Long secrets.** JWTs, bearer tokens, vendor keys (`sk_`, `whsec_`, `hlm_sk_`, `sntrys_`) and `key=value` secrets of any length are now redacted whole. The old bounded patterns left the tail of anything longer than their limit.
