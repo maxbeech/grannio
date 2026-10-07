@@ -147,6 +147,8 @@ and `SENTRY_DSN` as Helm7 variables (see `.env.example`); without them nothing i
 so. Everything sent passes through `lib/scrub.ts`. Server code reports problems with `captureServerError` from
 `lib/observability.ts`: pass ids, codes and counts only, never names, emails or free text.
 
+The Sentry scrubber (`lib/scrub.ts`) redacts secrets of any length, backs up to a clean boundary when it truncates, and fails closed; its regression tests are in `test/scrub-hardening.test.mts`.
+
 ## Data & disclaimers
 
 Cost figures are planning estimates from 2024–2025 ADU cost ranges scaled by a regional
