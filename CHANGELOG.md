@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-19: On-page SEO fix for the California ADU rules guide
+
+- The `california-adu-rules-2026` meta description was 167 characters, past the ~160 that desktop search results show. It is now 151 characters and keeps the same key facts.
+
 ## 2026-10-19: llms.txt added for AI assistants
 
 - `/llms.txt` was a 404 (the Next.js error page with a `noindex` meta), so AI assistants had no short, machine-readable description of the product or its key pages. `public/llms.txt` now serves a summary, the canonical host and links to the methodology, state, cost and blog pages.

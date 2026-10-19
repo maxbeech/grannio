@@ -99,7 +99,7 @@ export const POSTS: Post[] = [
     imageAlt: "Modern house exterior in California",
     title: "California ADU Rules in 2026: Size, Setbacks & Parking",
     description:
-      "A plain-English guide to California's statewide ADU law in 2026 — the 800 sq ft guarantee, 4 ft setbacks, the transit parking exemption and the 60-day approval rule.",
+      "A plain-English guide to California's statewide ADU law in 2026: the 800 sq ft guarantee, 4 ft setbacks, transit parking exemption and 60-day approval.",
     keyword: "california adu rules",
     date: "2026-06-14",
     readingMinutes: 8,
