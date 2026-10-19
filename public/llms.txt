@@ -1,0 +1,18 @@
+# Grannio
+
+> Grannio is a free accessory dwelling unit (ADU) feasibility checker and cost calculator. Pick a US state, an ADU type and a size to see what the local rules allow (size, setbacks, parking, owner-occupancy) and what a backyard ADU is likely to cost, built from regional construction-cost indices and published statewide ADU statutes.
+
+Canonical host: https://www.grannio.com
+
+## Key pages
+
+- [Home](https://www.grannio.com/): ADU feasibility check and cost calculator
+- [Methodology](https://www.grannio.com/methodology): how every estimate is derived and what sources it relies on
+- [California ADU rules and cost](https://www.grannio.com/california): statewide ADU rules and cost estimate for California
+- [ADU cost by type](https://www.grannio.com/cost/detached): detached, garage conversion, JADU, prefab and attached ADU cost pages under /cost/
+- [How much does an ADU cost](https://www.grannio.com/blog/how-much-does-an-adu-cost): guide to ADU construction costs
+
+## Optional
+
+- [Sitemap](https://www.grannio.com/sitemap.xml): every indexable page
+- [Blog](https://www.grannio.com/blog): ADU cost and rules guides
