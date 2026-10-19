@@ -374,15 +374,35 @@ export function getPost(slug: string): Post | undefined {
   return POSTS.find((p) => p.slug === slug);
 }
 
-/** Up to `n` other posts to surface as "related reading" (internal linking). */
+function topicTokens(p: Post): Set<string> {
+  const text = [p.title, p.keyword, ...(p.supportingKeywords ?? [])].join(" ").toLowerCase();
+  return new Set(text.split(/[^a-z0-9]+/).filter((w) => w.length > 3 && !["guide", "what", "with", "your"].includes(w)));
+}
+
+/** Up to `n` other posts to surface as "related reading" (internal linking): the
+ * most topically similar first (shared title/keyword words), topped up by rotation
+ * so every guide keeps receiving links from its neighbours. */
 export function relatedPosts(slug: string, n = 3): Post[] {
   const idx = POSTS.findIndex((p) => p.slug === slug);
   if (idx === -1) return POSTS.slice(0, n);
-  const rest: Post[] = [];
+  const mine = topicTokens(POSTS[idx]);
+  const scored = POSTS.filter((_, i) => i !== idx)
+    .map((p) => ({ p, score: [...topicTokens(p)].filter((w) => mine.has(w)).length }))
+    .filter((x) => x.score > 1)
+    .sort((a, b) => b.score - a.score)
+    .map((x) => x.p);
+  const rest: Post[] = scored.slice(0, Math.ceil(n / 2));
   for (let i = 1; i <= POSTS.length && rest.length < n; i++) {
-    rest.push(POSTS[(idx + i) % POSTS.length]);
+    const cand = POSTS[(idx + i) % POSTS.length];
+    if (cand.slug !== slug && !rest.includes(cand)) rest.push(cand);
   }
   return rest;
+}
+
+/** Guides whose title or keyword mentions `term`, for linking from hub pages. */
+export function guidesMentioning(term: string, n = 4): Post[] {
+  const t = term.toLowerCase();
+  return POSTS.filter((p) => `${p.title} ${p.keyword}`.toLowerCase().includes(t)).slice(0, n);
 }
 
 // ──────────────────────────────────────────────────────────────────────────────

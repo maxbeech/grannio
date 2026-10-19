@@ -6,6 +6,7 @@ import { STATES } from "@/lib/states";
 import BuilderLeadForm from "@/components/BuilderLeadForm";
 import { costMetaTitle, costMetaDescription, breadcrumbLd } from "@/lib/seo";
 import { site } from "@/lib/site";
+import { guidesMentioning } from "@/lib/posts";
 
 // ISR: prerendered at build and revalidated weekly (604800s) — keeps pages on
 // the ISR cache while staying fresh if data changes.
@@ -88,6 +89,16 @@ export default async function CostTypePage({ params }: Props) {
         </div>
       </section>
 
+      {guidesMentioning(t.slug === "garage-conversion" ? "garage" : t.slug).length > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold text-slate-900">Related guides</h2>
+          <ul className="mt-3 space-y-2">
+            {guidesMentioning(t.slug === "garage-conversion" ? "garage" : t.slug).map((g) => (
+              <li key={g.slug}><Link href={`/blog/${g.slug}`} className="text-emerald-700 hover:underline">{g.title}</Link></li>
+            ))}
+          </ul>
+        </section>
+      )}
       <p className="text-xs leading-relaxed text-slate-500">{site.disclaimer}</p>
     </div>
   );
