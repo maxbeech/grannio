@@ -17,4 +17,6 @@ for (const path of ["/", "/texas", "/texas/austin", "/robots.txt", "/sitemap.xml
   const res = proxy(new NextRequest(`https://www.grannio.com${path}`));
   check(`${path} passes through`, res.status === 200 && res.headers.get("x-middleware-next") === "1");
 }
+const probe = proxy(new NextRequest("https://www.grannio.com/_not-found", { method: "POST", headers: { "x-middleware-subrequest": "middleware:middleware" } }));
+check("x-middleware-subrequest -> 400", probe.status === 400);
 if (fail) process.exit(1);

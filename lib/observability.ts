@@ -14,6 +14,21 @@ function hasDsn(): boolean {
 
 type Context = Record<string, string | number | boolean | null | undefined>;
 
+/**
+ * Turn whatever was thrown or returned into an Error with a readable message.
+ * Supabase and Stripe-style failures are plain objects with a `message`;
+ * `String(obj)` would report them all as "[object Object]".
+ */
+export function toError(err: unknown): Error {
+  if (err instanceof Error) return err;
+  if (typeof err === "string" && err) return new Error(err);
+  if (err && typeof err === "object") {
+    const { message, code } = err as { message?: unknown; code?: unknown };
+    if (typeof message === "string" && message) return new Error(typeof code === "string" && code ? `${message} (${code})` : message);
+  }
+  return new Error("Non-Error value reported");
+}
+
 export function captureServerError(err: unknown, context: Context = {}): void {
   const scope = typeof context.scope === "string" ? context.scope : "server";
   try {
@@ -21,7 +36,7 @@ export function captureServerError(err: unknown, context: Context = {}): void {
       Sentry.withScope((s) => {
         s.setTag("scope", scope);
         for (const [k, v] of Object.entries(context)) if (k !== "scope") s.setExtra(k, v);
-        s.captureException(err instanceof Error ? err : new Error(String(err)));
+        s.captureException(toError(err));
       });
       return;
     }

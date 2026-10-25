@@ -10,6 +10,8 @@ import { NextResponse, type NextRequest } from "next/server";
  * encoded dot, so refuse it before routing.
  */
 export function proxy(request: NextRequest) {
+  // CVE-2025-29927 probe: only Next itself sets this header. Refuse it outright.
+  if (request.headers.has("x-middleware-subrequest")) return new NextResponse(null, { status: 400 });
   const rawPath = request.url.replace(/^[a-z]+:\/\/[^/]+/i, "").split("?")[0];
   if (/%2e/i.test(rawPath)) return new NextResponse("Not found", { status: 404 });
   return NextResponse.next();

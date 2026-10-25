@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-25: Stop reporting scanner probes as errors
+
+- **Why.** Crawlers and exploit scanners POST to a page with `Accept: text/x-component`, a made-up `Next-Action` id and an `x-middleware-subrequest` header. Next.js refuses the request, then throws `Invariant: Expected RSC response, got text/plain` and Sentry opened an issue for each. Nothing was wrong with the app.
+- **Change.** `lib/sentry-probe-filter.ts` (`isScannerProbeEvent`) drops exactly that error when the request is a POST carrying an RSC or action marker. It runs first in `beforeSend` in `lib/sentry-options.ts`. Any other error, including other invariants, still reports. `proxy.ts` now answers 400 to any request carrying `x-middleware-subrequest`, which only Next itself sets.
+- **Also.** `captureServerError` (`lib/observability.ts`) now keeps the message of a non-Error failure through `toError`. A Supabase error from the pending report order insert was reported as `Error: [object Object]` (GRANNIO_WEB-6) and hid the real cause. Test: `test/observability.test.mts`.
+- **Tests.** The filter and `sharedSentryOptions().beforeSend` are covered in the probe filter test.
+
 ## 2026-10-19: On-page SEO fix for the California ADU rules guide
 
 - The `california-adu-rules-2026` meta description was 167 characters, past the ~160 that desktop search results show. It is now 151 characters and keeps the same key facts.
