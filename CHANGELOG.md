@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-26: Blog posts carry their focus keywords in meta keywords
+
+- The on-page audit found the 40 blog posts defined a focus keyword and supporting keywords that never reached the page. `generateMetadata()` in `app/blog/[slug]/page.tsx` now sets `keywords` to the focus keyword followed by the supporting keywords, so each guide's `<meta name="keywords">` matches its content.
+
 ## 2026-10-25: Stop reporting scanner probes as errors
 
 - **Why.** Crawlers and exploit scanners POST to a page with `Accept: text/x-component`, a made-up `Next-Action` id and an `x-middleware-subrequest` header. Next.js refuses the request, then throws `Invariant: Expected RSC response, got text/plain` and Sentry opened an issue for each. Nothing was wrong with the app.
