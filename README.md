@@ -37,7 +37,7 @@ primary keyword, six supporting terms, a current publication date, descriptive i
 official sources, a decision table, FAQ data, a practical CTA and 1,200–2,500 words of rendered
 copy. `SEPTEMBER_POSTS` is exported from `lib/posts.ts` and is covered by the content test so the
 batch cannot silently gain duplicate or underspecified posts. The shared App Router template adds
-canonical, Open Graph, Twitter, BlogPosting, FAQ and breadcrumb metadata; it also renders source
+canonical, Open Graph, Twitter, meta keywords (focus plus supporting terms), BlogPosting, FAQ and breadcrumb metadata; it also renders source
 links, an on-page contents list and three related guides. As with all posts in `POSTS`, the index,
 static paths and sitemap are generated automatically from the same registry.
 

@@ -23,6 +23,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: post.title,
     description: post.description,
+    // Focus keyword first, then supporting terms, so the page's meta keywords match its content.
+    keywords: [post.keyword, ...(post.supportingKeywords ?? [])],
     alternates: { canonical: `${site.url}/blog/${post.slug}` },
     openGraph: {
       title: post.title,
