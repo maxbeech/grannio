@@ -3,6 +3,7 @@ import { site } from "@/lib/site";
 import { captureServerError } from "@/lib/observability";
 import { isValidEmail } from "@/lib/lead";
 import { getStripe, REPORT_PRICE_CENTS, REPORT_PRICE_CURRENCY } from "@/lib/stripe";
+import { insertPendingOrder } from "@/lib/report-orders";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 // Node.js route handler — creates a real Stripe Checkout Session for the $49
@@ -85,9 +86,9 @@ export async function POST(request: Request) {
       },
     });
 
-    const { error } = await supabase.from("report_orders").insert({
+    const error = await insertPendingOrder(supabase, {
       stripe_session_id: session.id,
-      status: "pending",
+      status: "pending" as const,
       amount_cents: REPORT_PRICE_CENTS,
       currency: REPORT_PRICE_CURRENCY,
       email: body.email,
@@ -99,7 +100,7 @@ export async function POST(request: Request) {
     });
     // Don't block checkout on this — the webhook can still confirm the payment from
     // Stripe's own record even if this pending row failed to write.
-    if (error) captureServerError(error, { scope: "api/checkout/report", step: "pending_order_insert", code: error.code });
+    if (error) captureServerError(error, { scope: "api/checkout/report", step: "pending_order_insert", code: error.code ?? "" });
 
     return NextResponse.json({ ok: true, url: session.url });
   } catch (err) {

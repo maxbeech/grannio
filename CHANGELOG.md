@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-11-03: Pending report order survives a dropped Supabase connection (GRANNIO_WEB-7)
+
+- **Cause.** After Stripe created the Checkout Session, the write of the pending `report_orders` row failed with `TypeError: fetch failed` (supabase-js returns this as an error with an empty code rather than throwing). Two events within 25 seconds, none since. The buyer was not affected: checkout carries on, and the Stripe webhook recovers a paid order that has no pending row.
+- **Fix.** `insertPendingOrder` (`lib/report-orders.ts`) retries once after 750ms when the failure is a dropped connection. It checks for the row first, since the first request may have landed with only the reply lost, so a session never gets two rows. A real database refusal (any error with a code) is returned straight away and reported as before. Tests: `test/report-orders.test.mts`.
+
 ## 2026-10-25: Stop reporting scanner probes as errors
 
 - **Why.** Crawlers and exploit scanners POST to a page with `Accept: text/x-component`, a made-up `Next-Action` id and an `x-middleware-subrequest` header. Next.js refuses the request, then throws `Invariant: Expected RSC response, got text/plain` and Sentry opened an issue for each. Nothing was wrong with the app.
