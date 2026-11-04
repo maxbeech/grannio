@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-04: Content refresh for the California ADU rules and building codes guides
+
+- **Why.** Search Console showed both guides in striking distance (`california-adu-rules-2026`, 58 impressions over 90 days; `adu-building-codes`, 41). Neither post cited a source for its legal and code claims.
+- **California ADU rules.** Added a front-setback point (a front setback cannot block an ADU of up to 800 sq ft that keeps to the 4-foot side and rear setbacks) and the JADU owner-occupancy exception (it can still apply where the JADU shares the main house's bathroom). Added sources: the HCD ADU Handbook page and Government Code §66314.
+- **ADU building codes.** Replaced the sprinkler sentence that said California "exempted ADUs from the sprinkler mandate in 2020", which the sources did not confirm, with the rule as the sources describe it: an ADU generally does not need sprinklers when the main house has none, and cannot force sprinklers into the existing home. Added the same two sources.
+- **Not changed.** The visible post dates stay as they were: the HCD handbook and statute pages returned 403 from the review environment, so the wording is checked against search-result summaries of the statute and HCD letters, not the official text. Re-check against the handbook before the next date bump.
+
 ## 2026-11-03: Pending report order survives a dropped Supabase connection (GRANNIO_WEB-7)
 
 - **Cause.** After Stripe created the Checkout Session, the write of the pending `report_orders` row failed with `TypeError: fetch failed` (supabase-js returns this as an error with an empty code rather than throwing). Two events within 25 seconds, none since. The buyer was not affected: checkout carries on, and the Stripe webhook recovers a paid order that has no pending row.
