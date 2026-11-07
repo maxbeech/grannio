@@ -104,3 +104,5 @@
 - Fixed the standalone TypeScript test-check configuration and table-content narrowing.
 
 Generated Node analytics tests assert the empty error count without narrowing the mutable collection to `never[]`; storage-error checks remain unchanged.
+
+2026-11-06: The shared GA bootstrap disables implicit page views before startup, so the explicit route tracker owns the initial and subsequent SPA page views. Product value and active-return events remain enabled.
