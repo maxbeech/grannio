@@ -1,8 +1,14 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
+import { toNextRedirects } from "./lib/redirects";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  // Permanent 301s for URLs retired by content consolidation (lib/redirects.ts).
+  // Docs: https://nextjs.org/docs/app/api-reference/config/next-config-js/redirects
+  async redirects() {
+    return toNextRedirects();
+  },
 };
 
 export default withSentryConfig(nextConfig, {

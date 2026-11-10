@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-10: Consolidate the two Washington ADU law guides
+
+- **Why.** Search Console showed `washington-adu-law-hb-1337` at 3 impressions (position 25) and `washington-state-adu-rules` at 51 impressions, both on the same Washington ADU law query. The lifecycle verdict was CONSOLIDATE.
+- **What changed.** `washington-state-adu-rules` is the survivor. It gains the "Two ADUs per lot" section and the "What it means for you" section from the HB 1337 guide. Its parking bullet now matches the rule the HB 1337 guide and the House bill report describe: no off-street parking for an ADU within half a mile of a major transit stop, with local rules elsewhere. Its date is now 2026-11-10 after this substantive update.
+- **Redirect.** `/blog/washington-adu-law-hb-1337` returns a 301 to `/blog/washington-state-adu-rules`. The redirect lives in `lib/redirects.ts`, wired into `next.config.ts` `redirects()`, and is tested by `test/redirects.test.mts`. The HB 1337 post and its image are removed.
+- **Not changed.** The survivor's 5-foot setback and 1,000 sq ft statements could not be confirmed from the sources checked on 2026-11-10 and are unchanged. They need a check against the enacted RCW text.
+
 ## 2026-11-06: active return measurement
 
 - Record first measured visits and intentional returns using the shared three-hour, seven-day browser contract.

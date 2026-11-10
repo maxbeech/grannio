@@ -18,6 +18,10 @@ The growth engine is programmatic SEO over an un-saturated long-tail:
   (`how much does an adu cost`, `garage to adu conversion cost`, `california adu rules`, …)
 - `/methodology` — transparency/trust page on how every estimate is derived
 
+Retired URLs are permanent 301s, listed in `lib/redirects.ts` and wired into `next.config.ts`
+(`redirects()`). Add a row there whenever a page is consolidated into another; `test/redirects.test.mts`
+checks that every source is gone from the registry and every destination is live.
+
 All pages are statically generated with canonical URLs, JSON-LD (`Article`/`FAQPage` +
 `BreadcrumbList`), a dynamic Open Graph image (`next/og`), `sitemap.xml` and `robots.txt`.
 Page-template meta titles/descriptions live in `lib/seo.ts` (single source of truth) and
