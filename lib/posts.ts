@@ -1519,3 +1519,104 @@ export const SEPTEMBER_POSTS: Post[] = [
 }));
 
 POSTS.push(...SEPTEMBER_POSTS);
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Week of 2026-11-10: attached ADU cost, worked through the cost engine (lib/cost.ts)
+// ──────────────────────────────────────────────────────────────────────────────
+const NOV_2026_POSTS: Post[] = [
+  {
+    slug: "attached-adu-cost",
+    image: "/blog/how-much-does-an-adu-cost.jpg",
+    imageAlt: "Attached backyard unit built onto the side of a house, showing the attached adu cost question",
+    title: "Attached ADU Cost: What a Home Addition Really Costs",
+    description:
+      "What an attached ADU costs in 2026 when it shares a wall with your house, worked through a 600 sq ft estimate in Texas and California.",
+    keyword: "attached adu cost",
+    supportingKeywords: [
+      "adu addition cost",
+      "attached accessory dwelling unit cost",
+      "attached adu",
+      "shared wall adu",
+      "adu construction cost per square foot",
+      "home addition adu cost",
+      "regional cost index adu",
+      "adu site work cost",
+    ],
+    category: "Academy",
+    date: "2026-11-10",
+    readingMinutes: 7,
+    sources: [
+      {
+        name: "California HCD, Accessory Dwelling Unit Handbook",
+        href: "https://www.hcd.ca.gov/building-standards/adu/handbook",
+        note: "State guidance on ADU types and rules. Check the current addendum before relying on any attached-unit rule.",
+      },
+      {
+        name: "The House Plan Company, ADU Investment Guide (2025)",
+        href: "https://www.thehouseplancompany.com/blog/adu-investment-guide-part-1-understanding-costs-types-and-roi-in-2025/",
+        note: "Vendor guide with a 2025 attached-addition benchmark of $300 to $350 per sq ft. Used as a cross-check, not a survey.",
+      },
+      {
+        name: "Block Renovation, ADU construction costs per square foot",
+        href: "https://www.blockrenovation.com/guides/a-deep-dive-into-adu-construction-costs-what-the-per-square-foot-numbers-dont-tell-you",
+        note: "Explains why smaller units show a higher cost per square foot. Contractor content, so treated as directional.",
+      },
+    ],
+    blocks: [
+      { type: "p", text: "The attached adu cost sits between a garage conversion and a fully detached build, but the number you pay depends on the shared wall, the utilities you can tie into and the state you live in. This guide runs one example through Grannio's estimator so you can see where the money goes, and where a planning figure stops being reliable." },
+      { type: "h2", text: "What the estimator assumes for an attached ADU" },
+      { type: "p", text: "Grannio's cost engine prices an attached addition at $200 to $330 per square foot before any regional adjustment. That range is a national planning baseline built from published 2024 to 2025 ADU cost surveys, and it includes soft costs such as design, permits and impact fees. Every figure in this post is what the tool returns for the stated inputs, not a builder's quote." },
+      { type: "ul", items: [
+        "Attached addition: $200 to $330 per sq ft nationally, before the state index.",
+        "Site work: about 11% of the midpoint, covering the foundation tie-in, trenching and utility connections.",
+        "Soft costs: about 18% of the midpoint, covering design, permits, plan check and fees.",
+        "Regional index: Texas 0.92 and California 1.25. Every rate is multiplied by the index.",
+      ]},
+      { type: "h2", text: "A worked example: 600 sq ft in two states" },
+      { type: "p", text: "Take a 600 sq ft attached unit. The table shows the low-to-high range and the midpoint for Texas and California, with a detached build of the same size in Texas for comparison." },
+      { type: "table", caption: "Estimator output for a 600 sq ft unit (planning figures, rounded to the nearest $500)", headers: ["Scenario", "Per sq ft", "Estimated total", "Midpoint"], rows: [
+        ["Attached, Texas (index 0.92)", "$184 to $304", "$110,500 to $182,000", "$146,500"],
+        ["Attached, California (index 1.25)", "$250 to $413", "$150,000 to $247,500", "$199,000"],
+        ["Detached, Texas (index 0.92)", "$202 to $331", "$121,500 to $198,500", "$160,000"],
+        ["Detached, California (index 1.25)", "$275 to $450", "$165,000 to $270,000", "$217,500"],
+      ]},
+      { type: "p", text: "The same attached unit costs about $52,500 more at the midpoint in California than in Texas, and the regional index accounts for almost all of that gap. The attached midpoint is also below the detached midpoint in both states, by about $13,500 in Texas and $18,500 in California." },
+      { type: "p", text: "Split the Texas midpoint of $146,500 and the estimator gives roughly $104,000 for the structure and finishes, $26,400 for soft costs and $16,100 for site work. In California the same split is about $141,300, $35,800 and $21,900. The structure line moves most with the state, which is why a regional index matters more than any single national rate." },
+      { type: "h2", text: "Where the attached premium comes from" },
+      { type: "p", text: "A shared wall saves money because you are not building a full new envelope on that side, and the unit sits closer to the existing water, sewer and electrical service. That is why the estimator gives attached work a smaller site share, 11% of the midpoint against 14% for detached." },
+      { type: "p", text: "The savings are real but they are concentrated in one place: the join. The new unit still needs a structural tie-in, a roof connection that keeps the existing roof watertight, and finishes that match the house. Attached projects tend to overrun at that junction, because the new work meets old framing that nobody has fully opened up." },
+      { type: "h2", text: "What to check before you trust the number" },
+      { type: "ul", items: [
+        "The shared wall: if it carries load, the work may need engineering, a beam or a header that the midpoint does not show.",
+        "The roof and drainage: a low pitch, or a valley where the new roof meets the old, adds labour and materials.",
+        "The panel and service: a full kitchen and bathroom often need a new subpanel or a service upgrade.",
+        "The sewer and water mains: a deep or undersized line can mean trenching beyond the site-work allowance.",
+      ]},
+      { type: "p", text: "Published benchmarks disagree. A 2025 vendor guide puts attached additions at $300 to $350 per square foot, above the estimator's national baseline, and a general cost guide gives $200 to $300 for midrange builds. Treat those as cross-checks. Most of the gap between sources is finish level and metro area, which is why we apply the state index rather than quote a single national figure." },
+      { type: "p", text: "Smaller units also cost more per square foot, because permits, utility connections and a kitchen and bathroom are fixed costs spread over fewer feet. The estimator limits its size input to between 100 and 1,500 sq ft, so when you compare a 400 sq ft and an 800 sq ft attached unit, look at the rate per foot as well as the total." },
+      { type: "h2", text: "How to compare builder quotes for an attached unit" },
+      { type: "p", text: "Quotes for attached work are hard to compare because builders draw the join differently. One may price the roof tie-in and the structural header, another may leave both as allowances. Before you compare totals, ask each builder to price the same list of items, so the difference you see is a difference in price rather than in scope." },
+      { type: "ul", items: [
+        "Structural: who designs the header or beam, and whether an engineer's stamp is included.",
+        "Roof and envelope: how the new roof meets the existing one, and who warrants the join.",
+        "Utilities: whether the panel, water and sewer connections are in the price or billed as extras.",
+        "Finish match: whether the flooring, drywall and exterior are matched to the house or only to the new unit.",
+        "Allowances and contingency: the percentage held back for unknowns, and what triggers a change order.",
+      ]},
+      { type: "p", text: "Ask for the same drawings and the same allowance for the join from every bidder. If one quote is far below the others, the usual cause is that it leaves out a tie-in item rather than that the builder is more efficient. Use the estimator's midpoint as a sense check: a bid well under the low end of the range for your state needs a clear reason in writing." },
+      { type: "h2", text: "Attached or detached: how to decide" },
+      { type: "p", text: "Choose attached when you have a sound wall with clear access and a budget that cannot take on a new foundation for the whole unit. Choose detached when you want more privacy, a separate entrance on the far side of the lot, or a unit that might later be separated from the main house. Setbacks and parking depend on your address and zoning rather than on construction type, so confirm them locally before you price either option." },
+      { type: "cta", text: "Compare the detached build cost", href: "/blog/detached-adu-cost" },
+      { type: "p", text: "If your attached plan is really a conversion of space you already have, the garage cost is usually lower again. The garage to ADU conversion cost guide sets out the main differences in scope." },
+      { type: "cta", text: "Run your attached ADU estimate", href: "/" },
+      { type: "p", text: "Use the estimate to set a range, then take the same scope to at least two builders. Estimates are for planning only and do not replace a feasibility review or a written quote." },
+    ],
+    faq: [
+      { q: "Is an attached ADU cheaper than a detached one?", a: "Usually, yes, per square foot and in total. In the worked example the estimator gives a Texas midpoint of $146,500 for an attached 600 sq ft unit, against $160,000 for detached. The gap depends on the wall, the roof and the site, so confirm it with a survey." },
+      { q: "Does a shared wall lower the cost?", a: "It lowers site work and some framing, but a load-bearing wall, a roof tie-in and a matching finish can add cost back. Have the structure assessed before you count the saving." },
+      { q: "Why is the California estimate so much higher?", a: "Grannio applies a regional cost index of 1.25 for California against 0.92 for Texas. The same attached 600 sq ft unit runs from $150,000 to $247,500 in California and from $110,500 to $182,000 in Texas." },
+      { q: "Does the estimate include permit fees?", a: "Yes, within a soft-cost share of about 18% of the midpoint that covers design, permits, plan check and fees. Actual fees vary by city, so take the current schedule from your local building department before you finalise the budget." },
+    ],
+  },
+];
+POSTS.push(...NOV_2026_POSTS);
