@@ -79,6 +79,8 @@ renew against. Three lead types feed one backend:
 
 ### Lead capture backend
 
+Paid report checkout checks `report_orders` storage before opening Stripe and returns a payment link only after its pending order is saved. If the write fails, the unused session is expired when possible and checkout reports that it is unavailable.
+
 All three forms POST JSON to `app/api/lead/route.ts` (a Node.js route handler —
 not cached, every request runs live). The route never fakes success:
 

@@ -1,3 +1,8 @@
+## 2026-11-14: Report checkout storage guard
+
+- Check order storage before creating a report checkout and withhold the payment link if the pending order cannot be saved. Expire the unused Stripe session when possible.
+- Update Next.js and Sentry to patched releases.
+
 # Changelog
 
 ## 2026-11-10: Consolidate the two Washington ADU law guides

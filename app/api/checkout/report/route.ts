@@ -3,7 +3,7 @@ import { site } from "@/lib/site";
 import { captureServerError } from "@/lib/observability";
 import { isValidEmail } from "@/lib/lead";
 import { getStripe, REPORT_PRICE_CENTS, REPORT_PRICE_CURRENCY } from "@/lib/stripe";
-import { insertPendingOrder } from "@/lib/report-orders";
+import { prepareReportCheckout } from "@/lib/report-checkout-gate";
 import { getSupabaseAdmin } from "@/lib/supabase-admin";
 
 // Node.js route handler — creates a real Stripe Checkout Session for the $49
@@ -44,6 +44,7 @@ export async function POST(request: Request) {
   if (!body.email || !isValidEmail(body.email)) {
     return NextResponse.json({ ok: false, error: "Please enter a valid email address." }, { status: 400 });
   }
+  const email = body.email;
 
   const supabase = await getSupabaseAdmin();
   if (!supabase) {
@@ -59,50 +60,56 @@ export async function POST(request: Request) {
 
   try {
     const stripe = getStripe();
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      customer_email: body.email,
-      line_items: [
-        {
-          price_data: {
-            currency: REPORT_PRICE_CURRENCY,
-            unit_amount: REPORT_PRICE_CENTS,
-            product_data: {
-              name: "Grannio Detailed ADU Feasibility Report",
-              description: "Personalized ADU feasibility & cost report, emailed within 2 business days.",
+    const result = await prepareReportCheckout({
+      checkStorage: () => supabase.from("report_orders").select("id", { head: true }).limit(1),
+      createSession: () => stripe.checkout.sessions.create({
+        mode: "payment",
+        customer_email: email,
+        line_items: [
+          {
+            price_data: {
+              currency: REPORT_PRICE_CURRENCY,
+              unit_amount: REPORT_PRICE_CENTS,
+              product_data: {
+                name: "Grannio Detailed ADU Feasibility Report",
+                description: "Personalized ADU feasibility & cost report, emailed within 2 business days.",
+              },
             },
+            quantity: 1,
           },
-          quantity: 1,
+        ],
+        success_url: `${origin}/report/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: cancelUrl.toString(),
+        metadata: {
+          name: body.name || "",
+          zip: body.zip || "",
+          aduType: body.aduType || "",
+          timeline: body.timeline || "",
+          sourcePath: body.sourcePath || "",
         },
-      ],
-      success_url: `${origin}/report/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl.toString(),
-      metadata: {
-        name: body.name || "",
-        zip: body.zip || "",
-        aduType: body.aduType || "",
-        timeline: body.timeline || "",
-        sourcePath: body.sourcePath || "",
+      }),
+      saveOrder: async (session) => {
+        const { error } = await supabase.from("report_orders").insert({
+          stripe_session_id: session.id,
+          status: "pending" as const,
+          amount_cents: REPORT_PRICE_CENTS,
+          currency: REPORT_PRICE_CURRENCY,
+          email,
+          name: body.name || null,
+          zip: body.zip || null,
+          adu_type: body.aduType || null,
+          timeline: body.timeline || null,
+          source_path: body.sourcePath || null,
+        });
+        return error;
       },
+      expireSession: (session) => stripe.checkout.sessions.expire(session.id),
+      reportFailure: (error, step) => captureServerError(error, { scope: "api/checkout/report", step }),
     });
-
-    const error = await insertPendingOrder(supabase, {
-      stripe_session_id: session.id,
-      status: "pending" as const,
-      amount_cents: REPORT_PRICE_CENTS,
-      currency: REPORT_PRICE_CURRENCY,
-      email: body.email,
-      name: body.name || null,
-      zip: body.zip || null,
-      adu_type: body.aduType || null,
-      timeline: body.timeline || null,
-      source_path: body.sourcePath || null,
-    });
-    // Don't block checkout on this — the webhook can still confirm the payment from
-    // Stripe's own record even if this pending row failed to write.
-    if (error) captureServerError(error, { scope: "api/checkout/report", step: "pending_order_insert", code: error.code ?? "" });
-
-    return NextResponse.json({ ok: true, url: session.url });
+    if (!result.ok) {
+      return NextResponse.json({ ok: false, error: "We couldn't start checkout just now — please email us directly." }, { status: 503 });
+    }
+    return NextResponse.json({ ok: true, url: result.url });
   } catch (err) {
     captureServerError(err, { scope: "api/checkout/report", step: "stripe_session_create" });
     return NextResponse.json(
