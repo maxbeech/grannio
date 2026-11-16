@@ -1601,3 +1601,106 @@ const NOV_2026_POSTS: Post[] = [
   },
 ];
 POSTS.push(...NOV_2026_POSTS);
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Week of 2026-11-16: junior ADU requirements, worked through the cost engine
+// (lib/cost.ts) and the state rules data (lib/states.ts)
+// ──────────────────────────────────────────────────────────────────────────────
+const NOV_16_2026_POSTS: Post[] = [
+  {
+    slug: "junior-adu-requirements",
+    image: "/blog/how-much-does-an-adu-cost.jpg",
+    imageAlt: "Interior of a converted room inside a house, showing a junior ADU requirements question",
+    title: "Junior ADU Requirements: What a JADU Must Meet in 2026",
+    description:
+      "The junior ADU requirements that decide if a JADU fits your home: the 500 sq ft cap, one unit per lot, owner-occupancy and typical costs.",
+    keyword: "junior adu requirements",
+    supportingKeywords: [
+      "jadu requirements",
+      "junior adu size",
+      "junior accessory dwelling unit requirements",
+      "jadu owner occupancy",
+      "junior adu requirements california",
+      "jadu and adu",
+      "junior adu bathroom",
+      "500 sq ft junior adu",
+    ],
+    category: "Academy",
+    date: "2026-11-16",
+    readingMinutes: 7,
+    sources: [
+      {
+        name: "California HCD, Junior Accessory Dwelling Unit FAQ",
+        href: "https://www.hcd.ca.gov/policy-research/docs/faqsadujr.pdf",
+        note: "State FAQ on JADU size and location. Its owner-occupancy comparison may predate the 2026 change, so check the current version.",
+      },
+      {
+        name: "California HCD, ADU Handbook Update",
+        href: "https://www.hcd.ca.gov/sites/default/files/docs/policy-and-research/ADU-Handbook-Update.pdf",
+        note: "Current state handbook. Check its owner-occupancy section against Government Code section 66333 before relying on it.",
+      },
+      {
+        name: "City of Woodland, Junior Accessory Dwelling Unit (JADU)",
+        href: "https://cityofwoodland.gov/1413/Junior-Accessory-Dwelling-Unit-JADU",
+        note: "Local example of the 500 sq ft cap and the one-unit-per-lot rule. Local code varies, so use it as an illustration only.",
+      },
+      {
+        name: "Washington State Commerce, Accessory Dwelling Units",
+        href: "https://www.commerce.wa.gov/growth-management/housing-planning/adus/",
+        note: "State guidance on ADUs in Washington. No JADU-specific wording was found in this review, so check the city code.",
+      },
+    ],
+    blocks: [
+      { type: "p", text: "A junior ADU, or JADU, is the smallest legal form of backyard-style living space: a unit of up to 500 sq ft carved out of an existing or proposed single-family home. Whether you can build one turns on three things: your state's rules, your city's code, and whether the unit shares a bathroom with the main house. This guide sets out the junior ADU requirements that decide the question, then runs a 500 sq ft JADU through Grannio's estimator in Texas and California." },
+      { type: "h2", text: "The short answer: what a junior ADU must meet" },
+      { type: "ul", items: [
+        "Size: no more than 500 sq ft, built within the walls of a single-family home, whether that home already exists or is proposed.",
+        "Number: one JADU per single-family lot.",
+        "Location: the unit sits inside the house. A detached backyard building is a full ADU, not a JADU.",
+        "Kitchen: an efficiency kitchen is the usual standard, though local code sets the exact fixtures.",
+        "Owner-occupancy: depends on whether the JADU shares a bathroom with the main home. See the next section.",
+      ]},
+      { type: "h2", text: "The owner-occupancy rule has changed" },
+      { type: "p", text: "Older guidance treats owner-occupancy as a blanket requirement for JADUs. An HCD comparison table that many cities still link to lists it as required, but that table predates a 2026 change. Secondary summaries of AB 1154 say owner-occupancy now applies only when the JADU shares sanitation facilities with the main home, citing Government Code section 66333, with effect from 1 January 2026. An HCD fact sheet dated April 2026 says a JADU may share a bathroom with the single-family residence." },
+      { type: "p", text: "The same summaries say owner-occupancy cannot be required where the owner is a government agency, a land trust or a housing organisation. Confirm the current wording with your city before you design around it, and ask for the answer in writing if your bathroom plan depends on it." },
+      { type: "h2", text: "What Grannio's state data says" },
+      { type: "p", text: "Our state rules data records a statewide junior ADU allowance for California and Washington. For most other states it holds no statewide standard, so the answer comes from the city or county code. Two cautions apply. The California allowance sits alongside the owner-occupancy rule above. And our Washington flag marks JADUs as allowed statewide, but we could not find JADU-specific wording in the state's own guidance during this review. Check the city code before you rely on that flag." },
+      { type: "h2", text: "A worked example: a 500 sq ft JADU in Texas and California" },
+      { type: "p", text: "A junior ADU has the lowest national planning range of any type in Grannio's cost model, at $100 to $180 per sq ft before the state index. The 500 sq ft cap is the most useful size to price, so it is the test case here. The table shows the estimator's output for two states, with a detached build of the same size for comparison. Figures are rounded to the nearest $500, as the engine rounds them." },
+      { type: "table", caption: "Estimator output for a 500 sq ft unit (planning figures, rounded to the nearest $500)", headers: ["Scenario", "Per sq ft", "Estimated total", "Midpoint"], rows: [
+        ["JADU, Texas (index 0.92)", "$92 to $166", "$46,000 to $83,000", "$64,500"],
+        ["JADU, California (index 1.25)", "$125 to $225", "$62,500 to $112,500", "$87,500"],
+        ["Detached, Texas (index 0.92)", "$202 to $331", "$101,000 to $165,500", "$133,500"],
+        ["Detached, California (index 1.25)", "$275 to $450", "$137,500 to $225,000", "$181,500"],
+      ]},
+      { type: "p", text: "The midpoint for a JADU is $64,500 in Texas and $87,500 in California. The regional index accounts for the whole gap of $23,000, because the unit is the same size and type in both states. The detached comparison matters more: at the midpoint a 500 sq ft detached build costs about $69,000 more than a JADU in Texas, and about $94,000 more in California." },
+      { type: "p", text: "The split shows where the money goes. In Texas the $64,500 midpoint breaks into about $51,000 of structure and finishes, $11,600 of soft costs and $1,900 of site work. In California it breaks into about $69,100, $15,800 and $2,600. Site work is the smallest share here because the engine assumes a JADU reuses the existing shell and foundation, which is the main reason the type is the cheapest to build." },
+      { type: "h2", text: "What the estimate does not cover" },
+      { type: "p", text: "The engine treats a JADU as a reuse of the house, so its site allowance is only 3% of the midpoint. That assumption is most at risk where the existing home has a weak electrical service, an old sewer lateral or no room for a separate entrance. A bedroom conversion that needs a new panel, a second bathroom or a fire-rated wall between the unit and the main house can push the hard costs above the range." },
+      { type: "p", text: "Treat the figure as a floor for interior work, and price the electrical and plumbing services separately with a builder. Those items are where a junior ADU budget most often grows after the first quote." },
+      { type: "cta", text: "Compare a junior ADU with a full ADU", href: "/blog/adu-vs-jadu" },
+      { type: "h2", text: "Junior ADU or full ADU: how to choose" },
+      { type: "p", text: "A JADU suits you when you have a spare bedroom or a basement you can close off and you want the lowest build cost. It is the wrong choice if you want a separate backyard home with its own footprint, a unit larger than 500 sq ft, or a rental that is fully independent of the main house. A full ADU has its own rules on size, setbacks and parking, which differ by state." },
+      { type: "h2", text: "Checks to make before you design" },
+      { type: "ul", items: [
+        "Confirm the home is a single-family residence and that no other JADU already sits on the lot.",
+        "Confirm the owner-occupancy wording with the building department, including whether a shared bathroom changes it.",
+        "Plan the finished floor area, not the footprint, and keep it comfortably under the 500 sq ft cap.",
+        "Check early whether local code expects a separate entrance, and where it would sit.",
+        "Check the existing electrical panel and sewer capacity before you ask for interior quotes.",
+      ]},
+      { type: "cta", text: "Check your city's ADU rules", href: "/blog/adu-zoning-laws" },
+      { type: "h2", text: "The bottom line" },
+      { type: "p", text: "A junior ADU needs a single-family home, one unit per lot, at most 500 sq ft built within the house, and a clear answer on owner-occupancy for your bathroom plan. It is the lowest-cost ADU type in our model, with a midpoint of $64,500 for a 500 sq ft unit in Texas and $87,500 in California. Confirm the rules with your city before you commit, because the owner-occupancy wording has changed this year." },
+      { type: "cta", text: "Compare the garage conversion route", href: "/blog/garage-to-adu-conversion-cost" },
+      { type: "p", text: "Run your own state, size and type through the free calculator for a planning range. Estimates are for planning only and do not replace a feasibility review or a written quote." },
+    ],
+    faq: [
+      { q: "Is a junior ADU the same as an ADU?", a: "No. A JADU is up to 500 sq ft created within a single-family home, while a full ADU can be detached and larger. Both are types of accessory dwelling unit, but the rules differ." },
+      { q: "Do I have to live in the house to build a JADU?", a: "It depends. Secondary summaries of the 2026 California rule say owner-occupancy applies only when the JADU shares a bathroom with the main home, and some public and nonprofit owners are exempt. Confirm the current wording with your city." },
+      { q: "How much does a 500 sq ft junior ADU cost?", a: "Grannio's estimator gives a midpoint of $64,500 in Texas and $87,500 in California for a 500 sq ft unit, with ranges of $46,000 to $83,000 and $62,500 to $112,500. These are planning figures, not quotes." },
+      { q: "Can I have a JADU and a detached ADU on the same lot?", a: "Local rules decide this, and the answer varies by city. Ask the planning department before you design both." },
+    ],
+  },
+];
+POSTS.push(...NOV_16_2026_POSTS);
