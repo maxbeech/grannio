@@ -95,6 +95,7 @@ export default async function BlogPost({ params }: Props) {
     "@type": "BlogPosting",
     headline: post.title,
     description: post.description,
+    timeRequired: `PT${post.readingMinutes}M`,
     datePublished: post.date,
     author: { "@type": "Organization", name: site.name },
     publisher: { "@type": "Organization", name: site.name },
