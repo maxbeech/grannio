@@ -1,3 +1,9 @@
+## 2026-11-24: Refresh the ADU impact fees guide
+
+- **Why.** The weekly lifecycle pass gave `adu-impact-fees` a REFRESH verdict (23 impressions, position 16.2 over 90 days).
+- **What changed.** The Washington paragraph said the state had no impact fee rule for ADUs. RCW 36.70A.681(1)(a) caps ADU impact fees at 50% of the principal-unit fee, so the claim is corrected and the statute is cited. The California paragraph cites the current ADU statute (Government Code §66314 and following, formerly §65852.2) and explains the floor-area ratio used for ADUs over 750 sq ft. Sources are listed, and an internal link to the Washington ADU rules guide is added. Its date is now 2026-11-24 after this substantive update.
+- **Tests.** `test/adu-impact-fees-refresh.test.mts` is added to the `npm test` chain.
+
 ## 2026-11-14: Report checkout storage guard
 
 - Check order storage before creating a report checkout and withhold the payment link if the pending order cannot be saved. Expire the unused Stripe session when possible.
